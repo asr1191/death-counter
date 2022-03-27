@@ -1,13 +1,25 @@
-import { StatusBar } from 'expo-status-bar';
-import { NavigationContainer } from '@react-navigation/native';
 import { View, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions } from 'react-native'
+import { NavigationContainer, DarkTheme } from '@react-navigation/native';
+
+import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
+import AppLoading from 'expo-app-loading';
+import { useFonts } from 'expo-font';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
 
 export default function App() {
 
     let { height, width } = useWindowDimensions();
+
+    const [loaded] = useFonts({
+        RomanAntique: require('./assets/fonts/RomanAntique.ttf'),
+        OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
+    });
+
+    if (!loaded) {
+        return <AppLoading />
+    }
 
     return (
         <NavigationContainer>
@@ -29,13 +41,13 @@ export default function App() {
                         // width: width,
                         // height: height
                     }]}
-                    blurRadius={5}
+                    blurRadius={0}
                 >
                     <MainTabNavigator style={{
-                        borderRadius: 50,
+                        borderRadius: 30,
                         margin: 20,
-                        marginTop: Constants.statusBarHeight + 20,
-                        marginBottom: 40,
+                        marginTop: Constants.statusBarHeight + 15,
+                        backgroundColor: 'rgba(214, 201, 180, 0.1)',
                     }} />
                 </ImageBackground>
             </View>
@@ -49,10 +61,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     ringImageBgStyle: {
-        // top: '20%',
-        // height: '50%',
-        // width: '70%',
-        // left: '15%',
         opacity: 1
     }
 })

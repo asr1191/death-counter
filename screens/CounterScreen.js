@@ -9,10 +9,6 @@ import {
     Image,
     ImageBackground
 } from 'react-native';
-import Constants from 'expo-constants';
-
-import { useFonts } from 'expo-font';
-
 
 const MAX_DEATH = 201
 
@@ -42,14 +38,7 @@ export default function CounterScreen() {
 
     const counterRef = useRef(null)
 
-    const [loaded] = useFonts({
-        RomanAntique: require('../assets/fonts/RomanAntique.ttf'),
-        OptimusPrinceps: require('../assets/fonts/OptimusPrinceps.ttf')
-    });
 
-    if (!loaded) {
-        return null
-    }
 
     const renderItem = ({ item }) =>
     (
@@ -106,7 +95,7 @@ export default function CounterScreen() {
                     // backgroundColor: 'pink'
                 }}
             >
-                <Text>Hi</Text>
+                {/* <Text>Hi</Text> */}
             </View>
 
             <View style={{
@@ -153,7 +142,8 @@ export default function CounterScreen() {
             </View>
 
             <View style={{
-                flexBasis: 150
+                // flexBasis: 150
+                marginBottom: 50
             }}>
                 <Text style={styles.bossname}>Malenia,{'\n'}Blade of Miquella</Text>
                 <Image

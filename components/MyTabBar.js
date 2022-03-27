@@ -1,4 +1,3 @@
-import React from 'react'
 import { Animated, View, TouchableOpacity } from 'react-native';
 
 export default function MyTabBar({ state, descriptors, navigation, position }) {
@@ -43,13 +42,17 @@ export default function MyTabBar({ state, descriptors, navigation, position }) {
 
                 return (
                     <TouchableOpacity
+                        key={index}
                         accessibilityRole="button"
                         accessibilityState={isFocused ? { selected: true } : {}}
                         accessibilityLabel={options.tabBarAccessibilityLabel}
                         testID={options.tabBarTestID}
                         onPress={onPress}
                         onLongPress={onLongPress}
-                        style={{ flex: 1 }}
+                        style={{
+                            flex: 1,
+                            backgroundColor: '#453d30',
+                        }}
                     >
                         <Animated.Text style={{ opacity }}>
                             {label}
