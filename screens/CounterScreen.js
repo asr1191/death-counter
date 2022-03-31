@@ -47,7 +47,7 @@ export default function CounterScreen() {
         setItems(_initItemArray(MAX_DEATH))
         async function getAndScrollToIndex() {
             try {
-                AsyncStorage.clear();
+                // AsyncStorage.clear();
                 const startTime = new Date().getTime();
                 const targetIndex = await AsyncStorageHelper.getDataAsync('index')
                 const duration = new Date().getTime() - startTime;
@@ -76,7 +76,10 @@ export default function CounterScreen() {
             await AsyncStorageHelper.storeDataAsync('index', String(index))
             console.log('Saved index (' + index + ') to storage');
         }
-        if (index >= 0) {
+        if (index >= 0 && index < MAX_DEATH) {
+            counterRef.current.scrollToIndex({
+                index: index
+            })
             storeIndex();
         }
     },
@@ -85,20 +88,7 @@ export default function CounterScreen() {
 
     const _incrementCounter = () => {
         if (index + 1 < MAX_DEATH) {
-            counterRef.current.scrollToIndex({
-                index: index + 1
-            })
             setIndex(index + 1)
-        }
-    }
-
-    function _scrollToIndexCounter(target) {
-        if (target >= 0 && target < MAX_DEATH) {
-            console.log('scrolling to ' + target);
-            counterRef.current.scrollToIndex({
-                index: target
-            })
-            setIndex(target)
         }
     }
 
