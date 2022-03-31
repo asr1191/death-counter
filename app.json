@@ -5,24 +5,29 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "splash": {
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
-    "ios": {
-      "supportsTablet": true
+      "resizeMode": "cover",
+      "backgroundColor": "#030303",
+      "image": "./assets/death-counter-splash.png"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#FFFFFF"
-      },
-      "package": "blah.deathcounter"
+      "package": "com.vindveil.deathcounter",
+      "softwareKeyboardLayoutMode": "pan"
+    }
+  },
+  "updates": {
+    "fallbackToCacheTimeout": 0
+  },
+  "assetBundlePatterns": [
+    "**/*"
+  ],
+  "ios": {
+    "supportsTablet": true
+  },
+  "android": {
+    "adaptiveIcon": {
+      "backgroundColor": "#FFFFFF"
     },
-    "web": {}
-  }
+    "package": "com.vindveil.deathcounter"
+  },
+  "web": {}
 }

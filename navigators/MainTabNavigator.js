@@ -4,7 +4,7 @@ import { Dimensions } from 'react-native'
 
 import CounterScreen from '../screens/CounterScreen';
 import DatabaseScreen from '../screens/DatabaseScreen';
-import MyTabBar from '../components/MyTabBar';
+
 
 const Tab = createMaterialTopTabNavigator();
 

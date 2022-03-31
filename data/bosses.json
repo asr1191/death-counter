@@ -1,0 +1,49 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "title": "Rennala, Queen of the Full Moon",
+            "deaths": 23
+        },
+        {
+            "id": 2,
+            "title": "Malenia, Blade of Miquella",
+            "deaths": 130
+        },
+        {
+            "id": 3,
+            "title": "Margit, The Fell Omen",
+            "deaths": 14
+        },
+        {
+            "id": 4,
+            "title": "Rykard, Lord of Blasphemy",
+            "deaths": 44
+        },
+        {
+            "id": 5,
+            "title": "Godrick, The Grafted",
+            "deaths": 9
+        },
+        {
+            "id": 6,
+            "title": "Morgott, The Omen King",
+            "deaths": 12
+        },
+        {
+            "id": 7,
+            "title": "Mohg, The Lord of Blood",
+            "deaths": 144
+        },
+        {
+            "id": 8,
+            "title": "Godskin Noble",
+            "deaths": 19
+        },
+        {
+            "id": 9,
+            "title": "Godfrey, First Elden Lord (Golden Shade)",
+            "deaths": 19
+        }
+    ]
+}
