@@ -140,43 +140,62 @@ export default function CounterScreen() {
 
             <View style={{
                 alignItems: 'center',
+                justifyContent: 'space-between',
+                // marginTop: ??
             }}>
+                <View>{/* flexboxxx */}</View>
                 <ImageBackground
                     style={styles.ringImageBgComponent}
                     source={require('../assets/elden-ring-transparent-edge.png')}
-                    resizeMode={'cover'}
+                    resizeMode={'contain'}
                     imageStyle={styles.ringImageBgStyle}
                     blurRadius={3}
                 >
-                    <FlatList
-                        ref={counterRef}
-                        initialScrollIndex={index}
-                        style={{
-                            maxHeight: height,
-                            width: Dimensions.get('window').width,
-                        }}
-                        data={items}
-                        renderItem={renderItem}
-                        snapToInterval={height}
-                        showsVerticalScrollIndicator={false}
-                        fadingEdgeLength={height}
-                        overScrollMode={'never'}
-                        onMomentumScrollEnd={(event) => {
-                            let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(height))
-                            setIndex(floored)
-                        }}
-                        getItemLayout={(data, index) => ({ length: height, offset: height * index, index })}
-                    />
+
+                    <View style={{
+                        // flex: 1,
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}>
+                        <FlatList
+                            ref={counterRef}
+                            initialScrollIndex={index}
+                            style={{
+                                maxHeight: height,
+                                width: Dimensions.get('window').width,
+                            }}
+                            data={items}
+                            renderItem={renderItem}
+                            snapToInterval={height}
+                            showsVerticalScrollIndicator={false}
+                            fadingEdgeLength={height}
+                            overScrollMode={'never'}
+                            onMomentumScrollEnd={(event) => {
+                                let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(height))
+                                setIndex(floored)
+                            }}
+                            getItemLayout={(data, index) => ({ length: height, offset: height * index, index })}
+                        />
+                    </View>
+
+                </ImageBackground>
+                <View style={{
+                    // flex: 1,
+                    // justifyContent: '',
+                    alignItems: 'center',
+                    // margin: 'auto'
+                }}>
                     <Text style={styles.deaths}>D E A T H S</Text>
                     <Image
                         source={require('../assets/ornament-feathers.png')}
                         resizeMode={'contain'}
                         style={{
-                            width: 70,
-                            bottom: 30,
+                            // width: 70,
+                            height: 50
+                            // bottom: 30,
                         }}
                     />
-                </ImageBackground>
+                </View>
             </View>
 
             <View style={{
@@ -218,7 +237,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'RomanAntique',
         color: '#CFBB9B',
-        bottom: 5,
+        // bottom: 5,
     },
     bossname: {
         fontSize: 28,
@@ -232,13 +251,18 @@ const styles = StyleSheet.create({
 
     },
     ringImageBgComponent: {
+        // justifyContent: 'space-between',
         alignItems: 'center',
-        justifyContent: 'flex-end',
-        width: 300,
-        height: 430
+        overflow: 'visible'
+
+        // width: 300,
+        // height: 430
     },
     ringImageBgStyle: {
-        bottom: 100,
-        opacity: 0.2
+        // bottom: 110,
+        opacity: 0.2,
+        transform: [{
+            scale: 2
+        }]
     }
 })

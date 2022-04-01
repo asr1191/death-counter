@@ -25,9 +25,21 @@ function _initItemArray(maxNumber) {
     return items;
 }
 
+
 function _newLineAtComma(name) {
-    const index = name.indexOf(',')
-    return index >= 0 ? name.slice(0, index + 1) + '\n' + name.slice(index + 2) : name
+    let newName = name
+
+    let index = name.indexOf(',')
+    if (index >= 0) {
+        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
+    }
+
+    index = name.indexOf('(')
+    if (index >= 0) {
+        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
+    }
+
+    return newName
 }
 
 
@@ -40,35 +52,46 @@ export default function DatabaseScreen() {
         setItems(require('../data/bosses.json').data)
     }, [])
 
+    const handleSearch = function _handleSearch(queryText) {
+        // setItems([])
+    }
     const renderItem = ({ item }) =>
     (
         <View style={styles.item}>
             <View style={{
                 justifyContent: 'center',
-                // alignItems: 'center',
                 flex: 3,
                 marginLeft: 20
 
             }}>
-                <Text style={styles.itemText}>{_newLineAtComma(item.title)}</Text>
+                <View style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    marginVertical: 20
+
+                }}>
+                    <Text style={styles.itemText}>{_newLineAtComma(item.title)}</Text>
+                </View>
             </View>
             <View style={{
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
                 borderLeftWidth: 1,
-                borderLeftColor: 'rgba(243, 211, 158, 0.1)'
-                // margin: 5
+                borderLeftColor: 'rgba(243, 211, 158, 0.1)',
+                marginVertical: 20,
             }}>
                 <ImageBackground
                     style={{
-                        flex: 1,
-                        width: '100%',
+                        flexDirection: 'row',
                         alignItems: 'center',
+                        // marginVertical: 20
                         // overflow: 'hidden'
+
                     }}
                     imageStyle={{
                         opacity: 0.1,
+                        // width: '100%',
                         transform: [{
                             scale: 1.5
                         }]
@@ -78,9 +101,9 @@ export default function DatabaseScreen() {
                 >
                     <View style={{
                         flex: 1,
-                        width: '100%',
-                        height: '100%',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        // paddingVertical: 20
                     }}>
                         <Text style={styles.deathCount}>{item.deaths}</Text>
                     </View>
@@ -97,7 +120,7 @@ export default function DatabaseScreen() {
                     autoCorrect={false}
                     clearButtonMode="always"
                     // value={''}
-                    // onChangeText={queryText => handleSearch(queryText)}
+                    onChangeText={queryText => handleSearch(queryText)}
                     placeholder="Search"
                     style={styles.searchBox}
                 />
@@ -124,29 +147,24 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        width: '100%',
         backgroundColor: 'rgba(243, 211, 158, 0.1)',
         borderRadius: 15,
-        paddingVertical: 20,
+        // paddingVertical: 20,
         marginBottom: 10,
     },
     list: {
         width: '95%',
-        // paddingHorizontal: 10,
-        // paddingBottom: 10
         marginBottom: 10
     },
     itemText: {
         fontSize: 20,
         color: 'rgb(243, 211, 158)',
         fontFamily: 'OptimusPrinceps',
-        // marginLeft: 10
     },
     deathCount: {
         fontSize: 40,
         color: 'rgb(243, 211, 158)',
         // color: '#BB8D43',
         fontFamily: 'OptimusPrinceps',
-        height: '100%'
     }
 })

@@ -26,5 +26,5 @@ export default function useDatabase() {
         loadDataAsync();
     }, []);
 
-    return { isDBLoadingComplete, };
+    return { isDBLoadingComplete };
 }
