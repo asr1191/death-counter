@@ -2,15 +2,20 @@ import { useEffect, useState } from 'react';
 
 import { DatabaseHelper } from '../components/DatabaseHelper'
 
-export default function useDatabase() {
-    const [isDBLoadingComplete, setDBLoadingComplete] = useState(false);
+export default function useDatabase(setDBLoadingComplete) {
+    // const [isDBLoadingComplete, setDBLoadingComplete] = useState(false);
 
     useEffect(() => {
         async function loadDataAsync() {
             try {
-                await DatabaseHelper.dropDatabaseTablesAsync()
-                await DatabaseHelper.setupDatabaseAsync()
-                await DatabaseHelper.setupBossesAsync()
+                await DatabaseHelper.dropAllBossesTableAsync()
+                await DatabaseHelper.dropUserBossesTableAsync()
+
+                await DatabaseHelper.setupAllBossesTableAsync()
+                await DatabaseHelper.setupUserBossesTableAsync()
+
+                DatabaseHelper.tableRowCount('user_bosses', (arr) => { console.log('user_bosses table row count: %d', arr) });
+                // await DatabaseHelper.setupBossesAsync()
 
                 console.log('Finished database setup')
 
@@ -26,5 +31,5 @@ export default function useDatabase() {
         loadDataAsync();
     }, []);
 
-    return { isDBLoadingComplete };
+    // return { isDBLoadingComplete };
 }
