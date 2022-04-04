@@ -41,6 +41,7 @@ export default function CounterScreen() {
     const counterRef = useRef(null)
     useKeepAwake();
 
+    let lastSaveTime = 0;
 
     //Run once after mounting
     useEffect(() => {
@@ -57,8 +58,9 @@ export default function CounterScreen() {
                 console.log('Retrieved index (' + targetIndex + ') from storage in %sms', duration);
                 console.log('Retrieved boss name (' + bossName + ') from storage');
 
-                setIndex(targetIndex ? parseInt(targetIndex) : 0)
-                setTimeout(() => { SplashScreen.hideAsync() }, 250)
+                setTimeout(() => { setIndex(!isNaN(targetIndex) ? parseInt(targetIndex) : 0) }, 250)
+
+                // setTimeout(() => { SplashScreen.hideAsync() }, 500)
                 // setTimeout(() => { _scrollToIndexCounter(targetIndex) }, 5000)
 
             } catch (e) {
@@ -71,12 +73,14 @@ export default function CounterScreen() {
     )
 
     useEffect(() => {
+        // SplashScreen.hideAsync();
         console.log('Current Index: ' + index);
         async function storeIndex() {
             await AsyncStorageHelper.storeDataAsync('index', String(index))
             console.log('Saved index (' + index + ') to storage');
         }
         if (index >= 0 && index < MAX_DEATH) {
+            console.log('Scrolling to %d', index);
             counterRef.current.scrollToIndex({
                 index: index
             })
@@ -174,6 +178,7 @@ export default function CounterScreen() {
                                 let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(height))
                                 setIndex(floored)
                             }}
+                            scrollEventThrottle={3}
                             getItemLayout={(data, index) => ({ length: height, offset: height * index, index })}
                         />
                     </View>
@@ -236,10 +241,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         fontFamily: 'RomanAntique',
-        color: '#CFBB9B',
+        color: '#F3D39E',
         // bottom: 5,
     },
     bossname: {
+        // textDecorationLine: 'line-through',
         fontSize: 28,
         textAlign: 'center',
         fontFamily: 'OptimusPrinceps',
