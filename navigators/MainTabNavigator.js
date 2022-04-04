@@ -21,6 +21,8 @@ export default function MainTabNavigator(props) {
                 }
             }
             screenOptions={{
+                tabBarScrollEnabled: false,
+                // swipeEnabled: false,
                 // tabBarBounces: false,
                 tabBarStyle: {
                     backgroundColor: '#453d30',
@@ -55,7 +57,7 @@ export default function MainTabNavigator(props) {
                     // left: 43,
                     // bottom: 10
                 },
-                tabBarPressColor: 'transparent'
+                // tabBarPressColor: 'transparent'
             }}
         >
             <Tab.Screen
@@ -65,6 +67,9 @@ export default function MainTabNavigator(props) {
             <Tab.Screen
                 name="B O S S E S"
                 component={DatabaseScreen}
+                options={{
+                    swipeEnabled: false
+                }}
             />
         </Tab.Navigator>
     )
