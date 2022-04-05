@@ -9,30 +9,17 @@ import {
     ImageBackground,
     TouchableHighlight,
     TouchableOpacity,
-    FlatList
+    FlatList,
+    Keyboard
 } from 'react-native';
+
 import filter from 'lodash.filter';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
-import BossesListSwipeable from '../components/BossesListSwipeable';
+import remove from 'lodash.remove';
 
 import * as SplashScreen from 'expo-splash-screen';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import useDatabase from '../hooks/useDatabase';
-
-const MAX_DEATH = 100
-
-function _initItemArray(maxNumber) {
-    items = [];
-    for (let index = 0; index < maxNumber; index++) {
-        items.push({
-            id: index,
-            title: 'Rennala, Queen of the Full Moon',
-            deaths: 69
-        })
-    }
-    return items;
-}
 
 
 function _newLineAtComma(name) {
@@ -57,16 +44,13 @@ export default function DatabaseScreen() {
     const [allBosses, setAllBosses] = useState([])
     const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
     const [isDBLoadingComplete, setDBLoadingComplete] = useState(false)
+    const [searchInputText, setSearchInputText] = useState('')
 
+    const searchInput = useRef(null)
 
     useDatabase(setDBLoadingComplete)
 
-    useEffect(() => {
-        if (isDBLoadingComplete) {
-            SplashScreen.hideAsync()
-        }
-    }, [isDBLoadingComplete])
-
+    // Fetch initial data
     useEffect(() => {
         // setItems(_initItemArray(MAX_DEATH))
         const fetchedAllBossesData = require('../data/bosses.json').data
@@ -74,17 +58,31 @@ export default function DatabaseScreen() {
         setFilteredBosses(fetchedAllBossesData)
     }, [])
 
-    const handleSearch = (queryText) => {
+    // Hide SplashScreen
+    useEffect(() => {
+        if (isDBLoadingComplete) {
+            SplashScreen.hideAsync()
+        }
+    }, [isDBLoadingComplete])
+
+    // Filter results
+    useEffect(() => {
         let newItems = filter(allBosses, (item) => {
             let itemText = item.title.toLowerCase();
-            if (itemText.includes(queryText.toLowerCase())) {
-                return true
-            } else {
-                return false
-            }
+            return itemText.includes(searchInputText.toLowerCase())
         })
         setFilteredBosses(newItems)
+    }, [searchInputText, allBosses])
+
+    // On every Render
+    useEffect(() => {
+        console.log('NEW RENDER');
+    })
+
+    const handleSearch = (queryText) => {
+        setSearchInputText(queryText)
     }
+
     const renderItem = ({ item }) =>
     (
         <View style={styles.item}>
@@ -146,6 +144,20 @@ export default function DatabaseScreen() {
         rowMap[key].closeRow()
     }
 
+    const deleteRow = (rowMap, key) => {
+        const newBosses = [...allBosses]
+        remove(newBosses, (boss) => {
+            if (key == boss.key) {
+                console.log('Deleting item with key (%s)', boss.key);
+                return true
+            } else {
+                return false
+            }
+        })
+        // console.log(newBosses);
+        setAllBosses(newBosses)
+    }
+
     const renderHiddenItem = (data, rowMap) => (
         <View style={styles.rowBack}>
             <TouchableOpacity
@@ -166,7 +178,7 @@ export default function DatabaseScreen() {
             </TouchableOpacity>
             <TouchableOpacity
                 style={[styles.backBtn, styles.backRightBtnRight]}
-            // onPress={() => deleteRow(rowMap, data.item.key)}
+                onPress={() => deleteRow(rowMap, data.item.key)}
             >
                 <MaterialCommunityIcons
                     name="delete-outline"
@@ -205,11 +217,11 @@ export default function DatabaseScreen() {
                 // borderRadius: 20
             }}>
                 <TextInput
+                    ref={searchInput}
                     autoCapitalize={'sentences'}
                     autoCorrect={false}
-                    clearButtonMode={'always'}
-                    // value={''}
-                    onChangeText={queryText => handleSearch(queryText)}
+                    value={searchInputText}
+                    onChangeText={handleSearch}
                     placeholder={"Search or add bosses..."}
                     style={styles.searchBox}
                 />
@@ -254,6 +266,7 @@ export default function DatabaseScreen() {
                 friction={600}
                 tension={500}
                 recalculateHiddenLayout={true}
+                extraData={allBosses}
             />
         </View>
     );
