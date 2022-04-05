@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react';
 import { View, StyleSheet, ImageBackground, Image, Dimensions, useWindowDimensions } from 'react-native'
 import { NavigationContainer, DarkTheme } from '@react-navigation/native';
 
@@ -7,7 +8,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
-import useDatabase from './hooks/useDatabase';
+import CurrentBossContext from './contexts/CurrentBossContext';
 
 export default function App() {
 
@@ -46,12 +47,14 @@ export default function App() {
                         }]}
                         blurRadius={0}
                     >
-                        <MainTabNavigator style={{
-                            borderRadius: 30,
-                            marginTop: Constants.statusBarHeight,
-                            margin: 20,
-                            backgroundColor: 'rgba(214, 201, 180, 0.1)',
-                        }} />
+                        <CurrentBossContext>
+                            <MainTabNavigator style={{
+                                borderRadius: 30,
+                                marginTop: Constants.statusBarHeight,
+                                margin: 20,
+                                backgroundColor: 'rgba(214, 201, 180, 0.1)',
+                            }} />
+                        </CurrentBossContext>
                     </ImageBackground>
                 </View>
             </NavigationContainer>

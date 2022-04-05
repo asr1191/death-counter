@@ -9,9 +9,9 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 const Tab = createMaterialTopTabNavigator();
 
 export default function MainTabNavigator(props) {
+
     return (
         <Tab.Navigator
-            // tabBar={props => <MyTabBar {...props} />}
             initialLayout={{ width: Dimensions.get('window').width }}
             style={props.style}
             sceneContainerStyle={
@@ -22,8 +22,6 @@ export default function MainTabNavigator(props) {
             }
             screenOptions={{
                 tabBarScrollEnabled: false,
-                // swipeEnabled: false,
-                // tabBarBounces: false,
                 tabBarStyle: {
                     backgroundColor: '#453d30',
                     marginTop: 50,
@@ -49,15 +47,8 @@ export default function MainTabNavigator(props) {
                 },
                 tabBarIndicatorStyle: {
                     backgroundColor: '#F3D39E',
-                    // width: '100%',
-                    // opacity: 0.2,
-                    // height: '100%',
                     borderRadius: 30
-
-                    // left: 43,
-                    // bottom: 10
                 },
-                // tabBarPressColor: 'transparent'
             }}
         >
             <Tab.Screen

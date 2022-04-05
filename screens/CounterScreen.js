@@ -10,9 +10,6 @@ import {
     ImageBackground
 } from 'react-native';
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import * as SplashScreen from 'expo-splash-screen';
 import { useKeepAwake } from 'expo-keep-awake';
 import { AsyncStorageHelper } from '../components/AsyncStorageHelper';
 
@@ -40,8 +37,6 @@ export default function CounterScreen() {
 
     const counterRef = useRef(null)
     useKeepAwake();
-
-    let lastSaveTime = 0;
 
     //Run once after mounting
     useEffect(() => {
