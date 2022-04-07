@@ -1,23 +1,24 @@
 const { useState, createContext } = require("react");
 
-
-const [currentBoss, setCurrentBoss] = useState({
-    name: 'select boss to begin',
-    count: 0
-})
-
-const setCurrentBossWrapper = (name, count) => {
-    setCurrentBoss({
-        name: name,
-        count: count
-    })
-}
-
-
-export const Context = createContext({ currentBoss, setCurrentBossWrapper })
+export const Context = createContext({})
 
 export default function CurrentBossContext(props) {
 
-    return <Context.Provider>{props.children}</Context.Provider>
+    const [currentBoss, setCurrentBoss] = useState({
+        name: 'omg lol, dont look',
+        count: -1
+    })
+
+    const setCurrentBossWrapper = (name, count) => {
+        console.log('CONTEXT-FUNCTION: Updating currently selected boss to (%s, %d)', name, count);
+        setCurrentBoss({
+            name: name,
+            count: count
+        })
+    }
+
+    const contextValue = { currentBoss, setCurrentBossWrapper }
+
+    return <Context.Provider value={contextValue}>{props.children}</Context.Provider>
 
 }

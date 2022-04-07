@@ -14,10 +14,10 @@ export default function useDatabase(setDBLoadingComplete) {
                 await DatabaseHelper.setupAllBossesTableAsync()
                 await DatabaseHelper.setupUserBossesTableAsync()
 
-                DatabaseHelper.tableRowCount('user_bosses', (arr) => { console.log('user_bosses table row count: %d', arr) });
+                DatabaseHelper.tableRowCount('user_bosses', (arr) => { console.log('DATABASE-HOOK: user_bosses table row count: %d', arr) });
                 // await DatabaseHelper.setupBossesAsync()
 
-                console.log('Finished database setup')
+                console.log('DATABASE-HOOK: Finished database setup')
 
                 setDBLoadingComplete(true);
 

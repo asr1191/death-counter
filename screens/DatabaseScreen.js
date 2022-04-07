@@ -1,26 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useContext } from 'react'
 
 import {
     Text,
     View,
-    Dimensions,
     StyleSheet,
     TextInput,
     ImageBackground,
-    TouchableHighlight,
     TouchableOpacity,
-    FlatList,
-    Keyboard
+    TouchableNativeFeedback
 } from 'react-native';
 
 import filter from 'lodash.filter';
 import remove from 'lodash.remove';
 
-import * as SplashScreen from 'expo-splash-screen';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import useDatabase from '../hooks/useDatabase';
-
+import { Context } from '../contexts/CurrentBossContext';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -38,17 +33,19 @@ function _newLineAtComma(name) {
     return newName
 }
 
-export default function DatabaseScreen() {
+export default function DatabaseScreen(props) {
 
     const [filteredBosses, setFilteredBosses] = useState([])
     const [allBosses, setAllBosses] = useState([])
     const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
-    const [isDBLoadingComplete, setDBLoadingComplete] = useState(false)
+
     const [searchInputText, setSearchInputText] = useState('')
+
+    const { setCurrentBossWrapper } = useContext(Context)
 
     const searchInput = useRef(null)
 
-    useDatabase(setDBLoadingComplete)
+
 
     // Fetch initial data
     useEffect(() => {
@@ -59,11 +56,7 @@ export default function DatabaseScreen() {
     }, [])
 
     // Hide SplashScreen
-    useEffect(() => {
-        if (isDBLoadingComplete) {
-            SplashScreen.hideAsync()
-        }
-    }, [isDBLoadingComplete])
+
 
     // Filter results
     useEffect(() => {
@@ -83,61 +76,75 @@ export default function DatabaseScreen() {
         setSearchInputText(queryText)
     }
 
+    const handleItemTouch = (item) => {
+        const setBoss = (item) => {
+            setCurrentBossWrapper(item.title, item.deaths)
+        }
+        props.navigation.navigate('D E A T H S')
+        setTimeout(() => { setBoss(item) }, 0)
+        // setBoss(item)
+    }
+
     const renderItem = ({ item }) =>
     (
-        <View style={styles.item}>
-            <View style={{
-                justifyContent: 'center',
-                flex: 3,
-                marginLeft: 20
+        <TouchableNativeFeedback onPress={() => {
+            handleItemTouch(item)
+        }}>
+            <View style={styles.item}>
+                <View style={{
+                    justifyContent: 'center',
+                    flex: 3,
+                    marginLeft: 20
 
-            }}>
+                }}>
+                    <View style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        marginVertical: 20
+
+                    }}>
+                        <Text style={styles.itemText}>{_newLineAtComma(item.title)}</Text>
+                    </View>
+                </View>
                 <View style={{
                     flex: 1,
                     justifyContent: 'center',
-                    marginVertical: 20
-
+                    alignItems: 'center',
+                    borderLeftWidth: 1,
+                    borderLeftColor: 'rgba(243, 211, 158, 0.1)',
+                    marginVertical: 20,
                 }}>
-                    <Text style={styles.itemText}>{_newLineAtComma(item.title)}</Text>
+                    <ImageBackground
+                        style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            // marginVertical: 20
+                            // overflow: 'hidden'
+
+                        }}
+                        imageStyle={{
+                            opacity: 0.1,
+                            // width: '100%',
+                            transform: [{
+                                scale: 1.5
+                            }]
+                        }}
+                        source={require('../assets/floral-death-background.png')}
+                        resizeMode={'contain'}
+                    >
+                        <View style={{
+                            flex: 1,
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            // paddingVertical: 20
+                        }}>
+                            <Text style={styles.deathCount}>{item.deaths}</Text>
+                        </View>
+                    </ImageBackground>
                 </View>
             </View>
-            <View style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderLeftWidth: 1,
-                borderLeftColor: 'rgba(243, 211, 158, 0.1)',
-                marginVertical: 20,
-            }}>
-                <ImageBackground
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        // marginVertical: 20
-                        // overflow: 'hidden'
+        </TouchableNativeFeedback>
 
-                    }}
-                    imageStyle={{
-                        opacity: 0.1,
-                        // width: '100%',
-                        transform: [{
-                            scale: 1.5
-                        }]
-                    }}
-                    source={require('../assets/floral-death-background.png')}
-                    resizeMode={'contain'}
-                >
-                    <View style={{
-                        flex: 1,
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        // paddingVertical: 20
-                    }}>
-                        <Text style={styles.deathCount}>{item.deaths}</Text>
-                    </View>
-                </ImageBackground>
-            </View>
-        </View>
     )
 
     const closeRow = (rowMap, key) => {

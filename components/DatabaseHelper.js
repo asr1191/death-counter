@@ -30,12 +30,23 @@ const insertBoss = (bossFirstName, bossLastName, deathCountArray, successFunc) =
     )
 }
 
+const updateUserBoss = async (id, order, deaths, defeated) => {
+    const defeatedInt = defeated ? 1 : 0;
+    return new Promise((resolve, reject) => {
+        db.transaction(tx => {
+            tx.executeSql(`UPDATE ${USER_BOSSES_TABLE} SET list_order=${order}, death_arr='[${deaths}]', is_defeated=${defeatedInt} WHERE boss_id=${id};`, [],
+                (_, result) => { console.debug('DATABASE: Boss data updated!  (%s)', ALL_BOSSES_TABLE); resolve(result) },
+                (_, error) => { console.log("error dropping bosses table"); reject(error) });
+        })
+    })
+}
+
 const dropUserBossesTableAsync = async () => {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
                 'DROP TABLE ' + ALL_BOSSES_TABLE, [],
-                (_, result) => { console.debug('Table dropped! (%s)', ALL_BOSSES_TABLE); resolve(result) },
+                (_, result) => { console.debug('DATABASE: Table dropped! (%s)', ALL_BOSSES_TABLE); resolve(result) },
                 (_, error) => {
                     console.log("error dropping bosses table"); reject(error)
                 }
@@ -49,7 +60,7 @@ const dropAllBossesTableAsync = async () => {
         db.transaction(tx => {
             tx.executeSql(
                 'DROP TABLE ' + USER_BOSSES_TABLE, [],
-                (_, result) => { console.debug('Table dropped! (%s)', USER_BOSSES_TABLE); resolve(result) },
+                (_, result) => { console.debug('DATABASE: Table dropped! (%s)', USER_BOSSES_TABLE); resolve(result) },
                 (_, error) => {
                     console.log("error dropping bosses table"); reject(error)
                 }
@@ -62,11 +73,11 @@ const setupAllBossesTableAsync = async () => {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS ' + ALL_BOSSES_TABLE + ' (boss_id integer primary key, boss_name text not null, death_count_array text not null);'
+                'CREATE TABLE IF NOT EXISTS ' + ALL_BOSSES_TABLE + ' (boss_id INTEGER PRIMARY KEY, boss_name TEXT NOT NULL);'
             );
         },
             (_, error) => { console.log("DATABASE ERROR: Couldn't create %s table.", ALL_BOSSES_TABLE); console.log(error); reject(error) },
-            (_, success) => { console.log('Table setup completed. (%s)', ALL_BOSSES_TABLE); resolve(success) }
+            (_, success) => { console.log('DATABASE: Table setup completed. (%s)', ALL_BOSSES_TABLE); resolve(success) }
         )
     })
 }
@@ -75,11 +86,11 @@ const setupUserBossesTableAsync = async () => {
     return new Promise((resolve, reject) => {
         db.transaction(tx => {
             tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS ' + USER_BOSSES_TABLE + ' (boss_id integer primary key, list_order integer not null, is_defeated text not null);'
+                'CREATE TABLE IF NOT EXISTS ' + USER_BOSSES_TABLE + ' (boss_id INTEGER PRIMARY KEY, list_order INTEGER NOT NULL, death_arr TEXT NOT NULL, is_defeated INTEGER NOT_NULL);'
             );
         },
             (_, error) => { console.log("DATABASE ERROR: Couldn't create %s table.", USER_BOSSES_TABLE); console.log(error); reject(error) },
-            (_, success) => { console.log('Table setup completed. (%s)', USER_BOSSES_TABLE); resolve(success) }
+            (_, success) => { console.log('DATABASE: Table setup completed. (%s)', USER_BOSSES_TABLE); resolve(success) }
         )
     })
 }
@@ -101,7 +112,7 @@ const tableRowCount = (tableName, resultCallback) => {
 const setupBossesAsync = async () => {
     return new Promise((resolve, _reject) => {
         db.transaction(tx => {
-            tx.executeSql("insert into " + ALL_BOSSES_TABLE + " (boss_id, boss_first_name, death_count_array) values (1,'Malenia, Blade of Miquella','[0]')");
+            tx.executeSql("insert into " + ALL_BOSSES_TABLE + " (boss_id, boss_first_name, death_count_array) values (1,'Malenia, Blade of Miquella')");
         },
             (_, error) => { console.log("db error insertBoss"); console.log(error); resolve() },
             (_, success) => { resolve(success) }
