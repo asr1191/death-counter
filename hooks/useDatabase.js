@@ -8,8 +8,8 @@ export default function useDatabase(setDBLoadingComplete) {
     useEffect(() => {
         async function loadDataAsync() {
             try {
-                await DatabaseHelper.dropAllBossesTableAsync()
-                await DatabaseHelper.dropUserBossesTableAsync()
+                // await DatabaseHelper.dropAllBossesTableAsync()
+                // await DatabaseHelper.dropUserBossesTableAsync()
 
                 await DatabaseHelper.setupAllBossesTableAsync()
                 await DatabaseHelper.setupUserBossesTableAsync()

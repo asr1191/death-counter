@@ -12,8 +12,8 @@ import {
 } from 'react-native';
 
 import { useKeepAwake } from 'expo-keep-awake';
-import { AsyncStorageHelper } from '../components/AsyncStorageHelper';
 
+import { AsyncStorageHelper } from '../components/AsyncStorageHelper';
 import { Context } from '../contexts/CurrentBossContext';
 import reTryTask from '../components/reTryTask';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,9 +50,7 @@ function _newLineAtComma(name) {
 let scrollPosition = -1
 
 const scrollFn = async (ref, index) => {
-    ref.current.scrollToIndex({
-        index: index
-    })
+
 }
 
 export default function CounterScreen() {
@@ -69,11 +67,10 @@ export default function CounterScreen() {
 
     //Run once after mounting
     useEffect(() => {
-        // setItems()
 
         async function retrieveSavedBoss() {
             try {
-                AsyncStorage.clear()
+                // AsyncStorage.clear()
                 const startTime = new Date().getTime();
                 let savedBoss = JSON.parse(await AsyncStorageHelper.getDataAsync('savedBoss'))
                 const duration = new Date().getTime() - startTime;
@@ -81,11 +78,6 @@ export default function CounterScreen() {
                 if (savedBoss != null) {
                     console.log('ASYNCSTORAGE: Retrieved boss (%s, %d) in %sms', savedBoss.name, savedBoss.count, duration);
                     setCurrentBossWrapper(savedBoss.name, parseInt(savedBoss.count))
-                    // if (counterRef.current != null) {
-                    //     counterRef.current.scrollToIndex({
-                    //         index: savedBoss.count
-                    //     })
-                    // }
                 } else {
                     console.log('ASYNCSTORAGE: No boss data retrieved.');
                     setCurrentBossWrapper('please select a boss', 0)
@@ -95,10 +87,38 @@ export default function CounterScreen() {
                 console.warn(e)
             }
         }
-        retrieveSavedBoss()
+        if (height != -1) {
+            retrieveSavedBoss()
+        }
     },
-        []
+        [height]
     )
+
+    // useEffect(() => {
+    //     console.log('PreRenderFlag: %s', preRenderFlag);
+    //     if (preRenderFlag) {
+    //         async function retrieveSavedBoss() {
+    //             try {
+    //                 // AsyncStorage.clear()
+    //                 const startTime = new Date().getTime();
+    //                 let savedBoss = JSON.parse(await AsyncStorageHelper.getDataAsync('savedBoss'))
+    //                 const duration = new Date().getTime() - startTime;
+
+    //                 if (savedBoss != null) {
+    //                     console.log('ASYNCSTORAGE: Retrieved boss (%s, %d) in %sms', savedBoss.name, savedBoss.count, duration);
+    //                     setCurrentBossWrapper(savedBoss.name, parseInt(savedBoss.count))
+    //                 } else {
+    //                     console.log('ASYNCSTORAGE: No boss data retrieved.');
+    //                     setCurrentBossWrapper('please select a boss', 0)
+    //                 }
+
+    //             } catch (e) {
+    //                 console.warn(e)
+    //             }
+    //         }
+    //         retrieveSavedBoss()
+    //     }
+    // }, [preRenderFlag])
 
     // Storage of selected boss
     useEffect(() => {
@@ -118,16 +138,13 @@ export default function CounterScreen() {
                 console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, count, count);
                 console.log('Also, data count: ', items.length);
                 try {
-                    //     reTryTask(3, () => {
-                    // setTimeout(() => {
-                    scrollFn(counterRef, count);
-                    // }, 0);
-                    // })
+                    counterRef.current.scrollToIndex({
+                        index: count
+                    })
                 } catch (e) {
                     console.log('COUNTER: Items length (%d)', items.length);
                     console.warn('COUNTERREF ERRORO LMAO');
                 }
-                // }
                 scrollPosition = count
             }
 
@@ -141,11 +158,6 @@ export default function CounterScreen() {
         if (count + 1 < MAX_DEATH && counterRef.current != null) {
             const newCount = count + 1
             console.log('COUNTER: Incrementing and scrolling to %d', newCount);
-            // reTryTask(3, () => {
-            //     counterRef.current.scrollToIndex({
-            //         index: newCount
-            //     })
-            // })
             setCurrentBossWrapper(name, newCount)
         }
     }
@@ -167,19 +179,7 @@ export default function CounterScreen() {
                     width: '100%'
                 }}
             >
-                {/* <ImageBackground
-                    style={{
-                        width: '100%',
-                    }}
-                    imageStyle={{
-                        height: '100%',
-                        opacity: 0.7
-                    }}
-                    resizeMode={'center'}
-                    source={require('../assets/count-glow-2.png')}
-                > */}
-                <Text style={styles.count} adjustsFontSizeToFit  >{item.title}</Text>
-                {/* </ImageBackground> */}
+                <Text style={styles.count} adjustsFontSizeToFit allowFontScaling={false} >{item.title}</Text>
             </View>
         </Pressable>
     )
@@ -216,6 +216,7 @@ export default function CounterScreen() {
 
             <View style={{
                 alignItems: 'center',
+                width: '100%',
                 justifyContent: 'space-between',
                 // marginTop: ??
             }}>
@@ -231,7 +232,8 @@ export default function CounterScreen() {
                     <View style={{
                         // flex: 1,
                         justifyContent: 'center',
-                        alignItems: 'center'
+                        alignItems: 'center',
+                        // width: '100%'
                     }}>
                         <ImageBackground
                             style={{
@@ -239,7 +241,7 @@ export default function CounterScreen() {
                             }}
                             imageStyle={{
                                 // height: '100%',
-                                opacity: 0.7
+                                opacity: 0.8
                             }}
                             resizeMode={'center'}
                             source={require('../assets/count-glow-2.png')}
@@ -250,6 +252,7 @@ export default function CounterScreen() {
                                 initialScrollIndex={count}
                                 style={{
                                     maxHeight: height,
+                                    // width: '100%'
                                     width: Dimensions.get('window').width,
                                 }}
                                 data={items}
@@ -349,7 +352,8 @@ const styles = StyleSheet.create({
     ringImageBgComponent: {
         // justifyContent: 'space-between',
         alignItems: 'center',
-        overflow: 'visible'
+        overflow: 'visible',
+        // width: '100%'
 
         // width: 300,
         // height: 430
