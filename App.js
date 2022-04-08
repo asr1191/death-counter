@@ -10,6 +10,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import MainTabNavigator from './navigators/MainTabNavigator'
 import CurrentBossContext from './contexts/CurrentBossContext';
 import useDatabase from './hooks/useDatabase';
+// import { useMMKV, useMMKVObject } from 'react-native-mmkv';
 
 export default function App() {
 
@@ -23,13 +24,15 @@ export default function App() {
         OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
     });
 
-    useDatabase(setDBLoadingComplete)
+    // const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
+    // useDatabase(setDBLoadingComplete)
 
-    useEffect(() => {
-        if (isDBLoadingComplete) {
-            SplashScreen.hideAsync()
-        }
-    }, [isDBLoadingComplete])
+    // useEffect(() => {
+    //     if (isDBLoadingComplete) {
+
+    //         SplashScreen.hideAsync()
+    //     }
+    // }, [isDBLoadingComplete])
 
     if (loaded) {
 

@@ -16,6 +16,7 @@ import remove from 'lodash.remove';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Context } from '../contexts/CurrentBossContext';
+import { useMMKVObject } from 'react-native-mmkv';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -38,14 +39,13 @@ export default function DatabaseScreen(props) {
     const [filteredBosses, setFilteredBosses] = useState([])
     const [allBosses, setAllBosses] = useState([])
     const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
-
     const [searchInputText, setSearchInputText] = useState('')
+
+    const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
 
     const { setCurrentBossWrapper } = useContext(Context)
 
     const searchInput = useRef(null)
-
-
 
     // Fetch initial data
     useEffect(() => {
@@ -56,7 +56,9 @@ export default function DatabaseScreen(props) {
     }, [])
 
     // Hide SplashScreen
-
+    useEffect(() => {
+        console.log(mmkvBossesList);
+    }, [mmkvBossesList])
 
     // Filter results
     useEffect(() => {
