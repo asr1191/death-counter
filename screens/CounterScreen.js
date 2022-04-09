@@ -136,7 +136,6 @@ export default function CounterScreen() {
             console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, count);
             if (scrollPosition != count && counterRef.current != null) {
                 console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, count, count);
-                console.log('Also, data count: ', items.length);
                 try {
                     counterRef.current.scrollToIndex({
                         index: count

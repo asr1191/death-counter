@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     TouchableNativeFeedback
 } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 
 import filter from 'lodash.filter';
 import remove from 'lodash.remove';
@@ -17,6 +18,8 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { Context } from '../contexts/CurrentBossContext';
 import { useMMKVObject } from 'react-native-mmkv';
+import BossListItem from '../components/BossListItem';
+import BossHiddenListItem from '../components/BossHiddenListItem';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -33,6 +36,9 @@ function _newLineAtComma(name) {
 
     return newName
 }
+const MemoizedRenderItem = React.memo(BossListItem)
+const MemoizedHiddenRenderItem = React.memo(BossHiddenListItem)
+const deathCountImage = require('../assets/floral-death-background.png')
 
 export default function DatabaseScreen(props) {
 
@@ -47,17 +53,22 @@ export default function DatabaseScreen(props) {
 
     const searchInput = useRef(null)
 
+
     // Fetch initial data
     useEffect(() => {
         // setItems(_initItemArray(MAX_DEATH))
         const fetchedAllBossesData = require('../data/bosses.json').data
+        setMMKVBossesList(fetchedAllBossesData)
+
         setAllBosses(fetchedAllBossesData)
         setFilteredBosses(fetchedAllBossesData)
     }, [])
 
     // Hide SplashScreen
     useEffect(() => {
-        console.log(mmkvBossesList);
+        // console.log('MMKV: Bosses list: %s', mmkvBossesList);
+        // if (mmkvBossesList.)
+        SplashScreen.hideAsync()
     }, [mmkvBossesList])
 
     // Filter results
@@ -71,7 +82,7 @@ export default function DatabaseScreen(props) {
 
     // On every Render
     useEffect(() => {
-        console.log('NEW RENDER');
+        console.log('<========NEW RENDER========>');
     })
 
     const handleSearch = (queryText) => {
@@ -87,118 +98,25 @@ export default function DatabaseScreen(props) {
         // setBoss(item)
     }
 
-    const renderItem = ({ item }) =>
-    (
-        <TouchableNativeFeedback onPress={() => {
-            handleItemTouch(item)
-        }}>
-            <View style={styles.item}>
-                <View style={{
-                    justifyContent: 'center',
-                    flex: 3,
-                    marginLeft: 20
-
-                }}>
-                    <View style={{
-                        flex: 1,
-                        justifyContent: 'center',
-                        marginVertical: 20
-
-                    }}>
-                        <Text style={styles.itemText}>{_newLineAtComma(item.title)}</Text>
-                    </View>
-                </View>
-                <View style={{
-                    flex: 1,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    borderLeftWidth: 1,
-                    borderLeftColor: 'rgba(243, 211, 158, 0.1)',
-                    marginVertical: 20,
-                }}>
-                    <ImageBackground
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            // marginVertical: 20
-                            // overflow: 'hidden'
-
-                        }}
-                        imageStyle={{
-                            opacity: 0.1,
-                            // width: '100%',
-                            transform: [{
-                                scale: 1.5
-                            }]
-                        }}
-                        source={require('../assets/floral-death-background.png')}
-                        resizeMode={'contain'}
-                    >
-                        <View style={{
-                            flex: 1,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            // paddingVertical: 20
-                        }}>
-                            <Text style={styles.deathCount}>{item.deaths}</Text>
-                        </View>
-                    </ImageBackground>
-                </View>
-            </View>
-        </TouchableNativeFeedback>
-
+    const renderItem = (obj) => (
+        <MemoizedRenderItem
+            item={obj.item}
+            setCurrentBossWrapper={setCurrentBossWrapper}
+            navigation={props.navigation}
+            deathCountImage={deathCountImage}
+        />
     )
 
-    const closeRow = (rowMap, key) => {
-        rowMap[key].closeRow()
-    }
-
-    const deleteRow = (rowMap, key) => {
-        const newBosses = [...allBosses]
-        remove(newBosses, (boss) => {
-            if (key == boss.key) {
-                console.log('Deleting item with key (%s)', boss.key);
-                return true
-            } else {
-                return false
-            }
-        })
-        // console.log(newBosses);
-        setAllBosses(newBosses)
-    }
-
     const renderHiddenItem = (data, rowMap) => (
-        <View style={styles.rowBack}>
-            <TouchableOpacity
-                style={[styles.backBtn, styles.backRightBtnLeft]}
-                onPress={() => closeRow(rowMap, data.item.key)}
-                onLayout={(event) => {
-                    setHiddenRowButtonWidth(event.nativeEvent.layout.width)
-                }}
-            >
-                <MaterialCommunityIcons
-                    name="sword-cross"
-                    size={35}
-                    color='rgba(47, 42, 35, 1)'
-                    style={{
-                        margin: 20
-                    }}
-                />
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={[styles.backBtn, styles.backRightBtnRight]}
-                onPress={() => deleteRow(rowMap, data.item.key)}
-            >
-                <MaterialCommunityIcons
-                    name="delete-outline"
-                    size={35}
-                    color='rgba(47, 42, 35, 1)'
-                    style={{
-                        margin: 20
-                    }}
-                />
-            </TouchableOpacity>
-        </View>
+        <MemoizedHiddenRenderItem
+            data={data}
+            rowMap={rowMap}
+            allBosses={allBosses}
+            setAllBosses={setAllBosses}
+            setHiddenRowButtonWidth={setHiddenRowButtonWidth}
+            hiddenRowButtonWidth={hiddenRowButtonWidth}
+        />
+
     );
 
     const onRowDidOpen = rowKey => {
