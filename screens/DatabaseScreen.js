@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useContext } from 'react'
-
 import {
     Text,
     View,
@@ -7,103 +6,76 @@ import {
     TextInput,
     ImageBackground,
     TouchableOpacity,
-    TouchableNativeFeedback
+    TouchableNativeFeedback,
+    Keyboard
 } from 'react-native';
-import * as SplashScreen from 'expo-splash-screen';
-
 import filter from 'lodash.filter';
 import remove from 'lodash.remove';
-
+import * as SplashScreen from 'expo-splash-screen';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { Context } from '../contexts/CurrentBossContext';
-import { useMMKVObject } from 'react-native-mmkv';
-import BossListItem from '../components/BossListItem';
-import BossHiddenListItem from '../components/BossHiddenListItem';
+import { useMMKVNumber, useMMKVObject } from 'react-native-mmkv';
 
-function _newLineAtComma(name) {
-    let newName = name
+import BossRenderItem from '../components/BossRenderItem';
+import BossHiddenRenderItem from '../components/BossHiddenRenderItem';
 
-    let index = name.indexOf(',')
-    if (index >= 0) {
-        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
-    }
-
-    index = name.indexOf('(')
-    if (index >= 0) {
-        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
-    }
-
-    return newName
-}
-const MemoizedRenderItem = React.memo(BossListItem)
-const MemoizedHiddenRenderItem = React.memo(BossHiddenListItem)
+// Optimization 
+const MemoizedRenderItem = React.memo(BossRenderItem)
+const MemoizedHiddenRenderItem = React.memo(BossHiddenRenderItem)
 const deathCountImage = require('../assets/floral-death-background.png')
 
 export default function DatabaseScreen(props) {
 
     const [filteredBosses, setFilteredBosses] = useState([])
-    const [allBosses, setAllBosses] = useState([])
     const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
     const [searchInputText, setSearchInputText] = useState('')
 
     const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
+    const [getNewId, setNewId] = useMMKVNumber('latest_id')
 
-    const { setCurrentBossWrapper } = useContext(Context)
-
-    const searchInput = useRef(null)
+    const searchInputRef = useRef(null)
+    const bossesSwipeListRef = useRef(null)
 
 
     // Fetch initial data
-    useEffect(() => {
-        // setItems(_initItemArray(MAX_DEATH))
-        const fetchedAllBossesData = require('../data/bosses.json').data
-        setMMKVBossesList(fetchedAllBossesData)
-
-        setAllBosses(fetchedAllBossesData)
-        setFilteredBosses(fetchedAllBossesData)
-    }, [])
+    // useEffect(() => {
+    // const fetchedAllBossesData = require('../data/bosses.json').data
+    // setMMKVBossesList(fetchedAllBossesData)
+    // setFilteredBosses(fetchedAllBossesData)
+    // }, [])
 
     // Hide SplashScreen
     useEffect(() => {
-        // console.log('MMKV: Bosses list: %s', mmkvBossesList);
-        // if (mmkvBossesList.)
         SplashScreen.hideAsync()
     }, [mmkvBossesList])
 
     // Filter results
     useEffect(() => {
-        let newItems = filter(allBosses, (item) => {
+        let newItems = filter(mmkvBossesList, (item) => {
             let itemText = item.title.toLowerCase();
             return itemText.includes(searchInputText.toLowerCase())
         })
         setFilteredBosses(newItems)
-    }, [searchInputText, allBosses])
+    }, [searchInputText, mmkvBossesList])
 
     // On every Render
     useEffect(() => {
-        console.log('<========NEW RENDER========>');
+        console.log('<========NEW RENDER (DATABASE SCREEN)========>');
     })
 
     const handleSearch = (queryText) => {
         setSearchInputText(queryText)
     }
 
-    const handleItemTouch = (item) => {
-        const setBoss = (item) => {
-            setCurrentBossWrapper(item.title, item.deaths)
-        }
-        props.navigation.navigate('D E A T H S')
-        setTimeout(() => { setBoss(item) }, 0)
-        // setBoss(item)
-    }
-
-    const renderItem = (obj) => (
+    const renderItem = (obj, rowMap) => (
         <MemoizedRenderItem
             item={obj.item}
-            setCurrentBossWrapper={setCurrentBossWrapper}
+            rowMap={rowMap}
             navigation={props.navigation}
             deathCountImage={deathCountImage}
+            mmkvBossesList={mmkvBossesList}
+            setMMKVBossesList={setMMKVBossesList}
+            bossesListRef={bossesSwipeListRef}
         />
     )
 
@@ -111,8 +83,8 @@ export default function DatabaseScreen(props) {
         <MemoizedHiddenRenderItem
             data={data}
             rowMap={rowMap}
-            allBosses={allBosses}
-            setAllBosses={setAllBosses}
+            mmkvBossesList={mmkvBossesList}
+            setMMKVBossesList={setMMKVBossesList}
             setHiddenRowButtonWidth={setHiddenRowButtonWidth}
             hiddenRowButtonWidth={hiddenRowButtonWidth}
         />
@@ -122,6 +94,24 @@ export default function DatabaseScreen(props) {
     const onRowDidOpen = rowKey => {
         console.log('This row opened', rowKey);
     };
+
+    const addBossHandler = () => {
+        if (searchInputText.length > 0) {
+            let newList = []
+            if (mmkvBossesList != undefined)
+                newList = mmkvBossesList
+            const newBoss = {
+                key: getNewId,
+                title: searchInputText,
+                deaths: 0
+            }
+            newList.splice(0, 0, newBoss)
+            setMMKVBossesList(newList)
+            setSearchInputText('')
+            setNewId(getNewId + 1)
+            Keyboard.dismiss()
+        }
+    }
 
 
     return (
@@ -144,7 +134,7 @@ export default function DatabaseScreen(props) {
                 // borderRadius: 20
             }}>
                 <TextInput
-                    ref={searchInput}
+                    listViewRef={bossesSwipeListRef}
                     autoCapitalize={'sentences'}
                     autoCorrect={false}
                     value={searchInputText}
@@ -152,8 +142,12 @@ export default function DatabaseScreen(props) {
                     placeholder={"Search or add bosses..."}
                     style={styles.searchBox}
                 />
-                <TouchableOpacity style={{
-                }}>
+                <TouchableOpacity
+                    style={{
+
+                    }}
+                    onPress={addBossHandler}
+                >
                     <View style={{
                         borderRadius: 5,
                         marginLeft: 10,
@@ -172,6 +166,7 @@ export default function DatabaseScreen(props) {
                 </TouchableOpacity>
             </View>
             <SwipeListView
+                listViewRef={bossesSwipeListRef}
                 style={styles.list}
                 data={filteredBosses}
                 renderItem={renderItem}
@@ -193,7 +188,7 @@ export default function DatabaseScreen(props) {
                 friction={600}
                 tension={500}
                 recalculateHiddenLayout={true}
-                extraData={allBosses}
+                extraData={mmkvBossesList}
             />
         </View>
     );

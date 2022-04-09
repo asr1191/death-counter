@@ -1,6 +1,4 @@
-// import { useContext } from 'react'
 import { ImageBackground, StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
-// import { Context } from '../contexts/CurrentBossContext'
 
 function _newLineAtComma(name) {
     let newName = name
@@ -18,19 +16,23 @@ function _newLineAtComma(name) {
     return newName
 }
 
+// const findBossIndex = (element) => {
+//     item.
+// }
 
-export default function BossListItem(props) {
 
-    // const { setCurrentBossWrapper } = useContext(Context)
+export default function BossRenderItem(props) {
 
     const handleItemTouch = () => {
-
-        const setBoss = (item) => {
-            props.setCurrentBossWrapper(item.title, item.deaths)
+        if (props.item != props.mmkvBossesList[0]) {
+            let newBossesList = props.mmkvBossesList
+            newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(props.item), 1)[0])
+            props.setMMKVBossesList(newBossesList);
+            props.bossesListRef.current.scrollToIndex({
+                index: 0
+            })
+            props.navigation.navigate('D E A T H S')
         }
-
-        props.navigation.navigate('D E A T H S')
-        setTimeout(() => { setBoss(props.item) }, 0)
     }
 
     return (

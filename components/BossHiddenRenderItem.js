@@ -3,14 +3,14 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import remove from 'lodash.remove';
 
-export default function BossHiddenListItem(props) {
+export default function BossHiddenRenderItem(props) {
 
     const closeRow = () => {
         props.rowMap[props.data.item.key].closeRow()
     }
 
     const deleteRow = () => {
-        const newBosses = [...props.allBosses]
+        const newBosses = [...props.mmkvBossesList]
         remove(newBosses, (boss) => {
             if (props.data.item.key == boss.key) {
                 console.log('Deleting item with key (%s)', boss.key);
@@ -20,7 +20,7 @@ export default function BossHiddenListItem(props) {
             }
         })
         // console.log(newBosses);
-        props.setAllBosses(newBosses)
+        props.setMMKVBossesList(newBosses)
     }
 
     const hiddenItemOnLayout = (event) => {

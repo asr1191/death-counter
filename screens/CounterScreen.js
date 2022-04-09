@@ -13,10 +13,9 @@ import {
 
 import { useKeepAwake } from 'expo-keep-awake';
 
-import { AsyncStorageHelper } from '../components/AsyncStorageHelper';
 import { Context } from '../contexts/CurrentBossContext';
-import reTryTask from '../components/reTryTask';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { useMMKVObject } from 'react-native-mmkv';
 
 const MAX_DEATH = 501
 
@@ -49,17 +48,14 @@ function _newLineAtComma(name) {
 
 let scrollPosition = -1
 
-const scrollFn = async (ref, index) => {
-
-}
-
-export default function CounterScreen() {
+export default function CounterScreen(props) {
 
     const [items, setItems] = useState(_initItemArray(MAX_DEATH))
     const [height, setHeight] = useState(-1)
     const [canMomentum, setCanMomentum] = useState(false);
 
     const { currentBoss: { count, name }, setCurrentBossWrapper } = useContext(Context);
+    const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
 
     const counterRef = useRef(null)
 
@@ -67,97 +63,67 @@ export default function CounterScreen() {
 
     //Run once after mounting
     useEffect(() => {
-
-        async function retrieveSavedBoss() {
+        if (height != -1 && mmkvBossesList != undefined && mmkvBossesList.length != 0) {
             try {
-                // AsyncStorage.clear()
-                const startTime = new Date().getTime();
-                let savedBoss = JSON.parse(await AsyncStorageHelper.getDataAsync('savedBoss'))
-                const duration = new Date().getTime() - startTime;
-
-                if (savedBoss != null) {
-                    console.log('ASYNCSTORAGE: Retrieved boss (%s, %d) in %sms', savedBoss.name, savedBoss.count, duration);
-                    setCurrentBossWrapper(savedBoss.name, parseInt(savedBoss.count))
-                } else {
-                    console.log('ASYNCSTORAGE: No boss data retrieved.');
-                    setCurrentBossWrapper('please select a boss', 0)
-                }
-
+                counterRef.current.scrollToIndex({
+                    index: mmkvBossesList[0].deaths
+                })
             } catch (e) {
-                console.warn(e)
+                console.warn('COUNTERREF ERRORO LMAO');
             }
-        }
-        if (height != -1) {
-            retrieveSavedBoss()
         }
     },
         [height]
     )
 
-    // useEffect(() => {
-    //     console.log('PreRenderFlag: %s', preRenderFlag);
-    //     if (preRenderFlag) {
-    //         async function retrieveSavedBoss() {
-    //             try {
-    //                 // AsyncStorage.clear()
-    //                 const startTime = new Date().getTime();
-    //                 let savedBoss = JSON.parse(await AsyncStorageHelper.getDataAsync('savedBoss'))
-    //                 const duration = new Date().getTime() - startTime;
 
-    //                 if (savedBoss != null) {
-    //                     console.log('ASYNCSTORAGE: Retrieved boss (%s, %d) in %sms', savedBoss.name, savedBoss.count, duration);
-    //                     setCurrentBossWrapper(savedBoss.name, parseInt(savedBoss.count))
-    //                 } else {
-    //                     console.log('ASYNCSTORAGE: No boss data retrieved.');
-    //                     setCurrentBossWrapper('please select a boss', 0)
-    //                 }
-
-    //             } catch (e) {
-    //                 console.warn(e)
-    //             }
-    //         }
-    //         retrieveSavedBoss()
-    //     }
-    // }, [preRenderFlag])
-
-    // Storage of selected boss
     useEffect(() => {
-        async function storeIndex() {
-            const savedBoss = {
-                name: name,
-                count: count
-            }
+        console.log('<========NEW RENDER (COUNTER SCREEN)========>');
+    })
 
-            await AsyncStorageHelper.storeDataAsync('savedBoss', JSON.stringify(savedBoss))
-            console.log('ASYNCSTORAGE: Saved boss (%s, %d)', name, count);
-        }
-
-        if (count >= 0) {
-            console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, count);
-            if (scrollPosition != count && counterRef.current != null) {
-                console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, count, count);
+    useEffect(() => {
+        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
+            console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, mmkvBossesList[0].deaths);
+            if (scrollPosition != mmkvBossesList[0].deaths && counterRef.current != null) {
+                console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, mmkvBossesList[0].deaths, mmkvBossesList[0].deaths);
                 try {
                     counterRef.current.scrollToIndex({
-                        index: count
+                        index: mmkvBossesList[0].deaths
                     })
                 } catch (e) {
-                    console.log('COUNTER: Items length (%d)', items.length);
                     console.warn('COUNTERREF ERRORO LMAO');
                 }
-                scrollPosition = count
+                scrollPosition = mmkvBossesList[0].deaths
+                console.log('NAVIGATOR: Navigating to DeathsScreen');
             }
-
-            storeIndex();
+        } else {
+            console.log('COUNTER: Resetting to zero');
+            try {
+                counterRef.current.scrollToIndex({
+                    index: 0
+                })
+            } catch (e) {
+                console.warn('COUNTERREF ERRORO LMAO');
+            }
         }
-    },
-        [name, count]
-    )
+    }, [mmkvBossesList])
+
 
     const _incrementCounter = () => {
-        if (count + 1 < MAX_DEATH && counterRef.current != null) {
-            const newCount = count + 1
-            console.log('COUNTER: Incrementing and scrolling to %d', newCount);
-            setCurrentBossWrapper(name, newCount)
+        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
+            let newList = mmkvBossesList
+            if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
+                console.log('COUNTER: Incrementing to %d', newList[0].deaths + 1);
+
+                const newBoss = {
+                    key: newList[0].key,
+                    title: newList[0].title,
+                    deaths: newList[0].deaths + 1
+                }
+
+                newList.splice(0, 1, newBoss)
+                setMMKVBossesList(newList)
+            }
         }
     }
 
@@ -193,7 +159,15 @@ export default function CounterScreen() {
             let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(height))
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
-            setCurrentBossWrapper(name, floored)
+
+            let newList = mmkvBossesList
+            const newBoss = {
+                key: newList[0].key,
+                title: newList[0].title,
+                deaths: floored
+            }
+            newList.splice(0, 1, newBoss)
+            setMMKVBossesList(newList)
         }
         setCanMomentum(false)
     }
@@ -262,8 +236,8 @@ export default function CounterScreen() {
                                 overScrollMode={'never'}
                                 onScroll={onScrollFn}
                                 onMomentumScrollEnd={onMomentumScrollEndFn}
-                                // scrollEventThrottle={3}
                                 getItemLayout={getItemLayoutFn}
+                            // scrollEventThrottle={3}
                             />
                         </ImageBackground>
                     </View>
@@ -303,7 +277,7 @@ export default function CounterScreen() {
 
                         style={styles.bossname}
                     >
-                        {_newLineAtComma(name)}
+                        {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)}
                     </Text>
                 </View>
                 <Image

@@ -9,7 +9,8 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
 import CurrentBossContext from './contexts/CurrentBossContext';
-import useDatabase from './hooks/useDatabase';
+
+import { useMMKVNumber } from 'react-native-mmkv';
 // import { useMMKV, useMMKVObject } from 'react-native-mmkv';
 
 export default function App() {
@@ -18,21 +19,18 @@ export default function App() {
 
     // let { height, width } = useWindowDimensions();
 
-    const [isDBLoadingComplete, setDBLoadingComplete] = useState(false)
     const [loaded] = useFonts({
         RomanAntique: require('./assets/fonts/RomanAntique.ttf'),
         OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
     });
 
-    // const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
-    // useDatabase(setDBLoadingComplete)
+    const [setNewId, getNewId] = useMMKVNumber('latest_id')
 
-    // useEffect(() => {
-    //     if (isDBLoadingComplete) {
-
-    //         SplashScreen.hideAsync()
-    //     }
-    // }, [isDBLoadingComplete])
+    useEffect(() => {
+        if (setNewId == undefined) {
+            getNewId(0)
+        }
+    }, [setNewId])
 
     if (loaded) {
 
