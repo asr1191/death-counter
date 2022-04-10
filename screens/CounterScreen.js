@@ -13,11 +13,11 @@ import {
 
 import { useKeepAwake } from 'expo-keep-awake';
 
-import { Context } from '../contexts/CurrentBossContext';
-
 import { useMMKVObject } from 'react-native-mmkv';
 
 const MAX_DEATH = 501
+const ITEM_HEIGHT = 200
+const ITEM_ARRAY = _initItemArray(MAX_DEATH)
 
 function _initItemArray(maxNumber) {
     items = [];
@@ -49,12 +49,8 @@ function _newLineAtComma(name) {
 let scrollPosition = -1
 
 export default function CounterScreen(props) {
-
-    const [items, setItems] = useState(_initItemArray(MAX_DEATH))
-    const [height, setHeight] = useState(-1)
     const [canMomentum, setCanMomentum] = useState(false);
 
-    const { currentBoss: { count, name }, setCurrentBossWrapper } = useContext(Context);
     const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
 
     const counterRef = useRef(null)
@@ -63,7 +59,7 @@ export default function CounterScreen(props) {
 
     //Run once after mounting
     useEffect(() => {
-        if (height != -1 && mmkvBossesList != undefined && mmkvBossesList.length != 0) {
+        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
             try {
                 counterRef.current.scrollToIndex({
                     index: mmkvBossesList[0].deaths
@@ -73,7 +69,7 @@ export default function CounterScreen(props) {
             }
         }
     },
-        [height]
+        []
     )
 
 
@@ -88,7 +84,8 @@ export default function CounterScreen(props) {
                 console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, mmkvBossesList[0].deaths, mmkvBossesList[0].deaths);
                 try {
                     counterRef.current.scrollToIndex({
-                        index: mmkvBossesList[0].deaths
+                        index: mmkvBossesList[0].deaths,
+                        animated: false,
                     })
                 } catch (e) {
                     console.warn('COUNTERREF ERRORO LMAO');
@@ -132,16 +129,17 @@ export default function CounterScreen(props) {
     (
         <Pressable onPress={_incrementCounter}>
             <View
-                onLayout={(event) => {
-                    if (height < 0) {
-                        setHeight(event.nativeEvent.layout.height)
-                    }
-                }}
+                // onLayout={(event) => {
+                //     if (height < 0) {
+                //         setHeight(event.nativeEvent.layout.height)
+                //     }
+                // }}
                 style={{
                     flex: 1,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: '100%'
+                    width: '100%',
+                    height: ITEM_HEIGHT
                 }}
             >
                 <Text style={styles.count} adjustsFontSizeToFit allowFontScaling={false} >{item.title}</Text>
@@ -156,7 +154,7 @@ export default function CounterScreen(props) {
 
     const onMomentumScrollEndFn = (event) => {
         if (canMomentum) {
-            let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(height))
+            let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(ITEM_HEIGHT))
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
@@ -172,7 +170,7 @@ export default function CounterScreen(props) {
         setCanMomentum(false)
     }
 
-    const getItemLayoutFn = (data, index) => ({ length: height, offset: height * index, index })
+    const getItemLayoutFn = (data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })
 
     return (
         <View style={{
@@ -222,17 +220,15 @@ export default function CounterScreen(props) {
 
                             <FlatList
                                 ref={counterRef}
-                                initialScrollIndex={count}
                                 style={{
-                                    maxHeight: height,
-                                    // width: '100%'
+                                    maxHeight: ITEM_HEIGHT,
                                     width: Dimensions.get('window').width,
                                 }}
-                                data={items}
+                                data={ITEM_ARRAY}
                                 renderItem={renderItem}
-                                snapToInterval={height}
+                                snapToInterval={ITEM_HEIGHT}
                                 showsVerticalScrollIndicator={false}
-                                fadingEdgeLength={height}
+                                fadingEdgeLength={ITEM_HEIGHT}
                                 overScrollMode={'never'}
                                 onScroll={onScrollFn}
                                 onMomentumScrollEnd={onMomentumScrollEndFn}

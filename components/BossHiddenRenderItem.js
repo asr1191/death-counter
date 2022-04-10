@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import remove from 'lodash.remove';
 
@@ -10,7 +10,7 @@ export default function BossHiddenRenderItem(props) {
     }
 
     const deleteRow = () => {
-        const newBosses = [...props.mmkvBossesList]
+        const newBosses = props.mmkvBossesList
         remove(newBosses, (boss) => {
             if (props.data.item.key == boss.key) {
                 console.log('Deleting item with key (%s)', boss.key);
@@ -30,9 +30,9 @@ export default function BossHiddenRenderItem(props) {
     }
 
     return (
-        <View style={styles.rowBack}>
+        <View style={styles.hiddenItem}>
             <TouchableOpacity
-                style={styles.backBtn}
+                style={styles.buttonStyle}
                 onPress={closeRow}
                 onLayout={hiddenItemOnLayout}
             >
@@ -40,22 +40,18 @@ export default function BossHiddenRenderItem(props) {
                     name="sword-cross"
                     size={35}
                     color='rgba(47, 42, 35, 1)'
-                    style={{
-                        margin: 20
-                    }}
+                    style={styles.iconStyle}
                 />
             </TouchableOpacity>
             <TouchableOpacity
-                style={styles.backBtn}
+                style={styles.buttonStyle}
                 onPress={deleteRow}
             >
                 <MaterialCommunityIcons
                     name="delete-outline"
                     size={35}
                     color='rgba(47, 42, 35, 1)'
-                    style={{
-                        margin: 20
-                    }}
+                    style={styles.iconStyle}
                 />
             </TouchableOpacity>
         </View>
@@ -63,7 +59,10 @@ export default function BossHiddenRenderItem(props) {
 }
 
 const styles = StyleSheet.create({
-    rowBack: {
+    iconStyle: {
+        margin: 20
+    },
+    hiddenItem: {
         alignItems: 'center',
         backgroundColor: 'rgba(243, 211, 158, 1)',
         flex: 1,
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
         // paddingVertical: 20,
         marginBottom: 11
     },
-    backBtn: {
+    buttonStyle: {
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 15,

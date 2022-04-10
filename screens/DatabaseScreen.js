@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Text,
     View,
@@ -22,7 +22,26 @@ import BossHiddenRenderItem from '../components/BossHiddenRenderItem';
 // Optimization 
 const MemoizedRenderItem = React.memo(BossRenderItem)
 const MemoizedHiddenRenderItem = React.memo(BossHiddenRenderItem)
+const MemoizedSwipeListView = React.memo(SwipeListView)
 const deathCountImage = require('../assets/floral-death-background.png')
+
+
+function _newLineAtComma(name) {
+    let newName = name
+
+    let index = name.indexOf(',')
+    if (index >= 0) {
+        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
+    }
+
+    index = name.indexOf('(')
+    if (index >= 0) {
+        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
+    }
+
+    return newName
+}
+
 
 export default function DatabaseScreen(props) {
 
@@ -33,21 +52,20 @@ export default function DatabaseScreen(props) {
     const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
 
-    const searchInputRef = useRef(null)
     const bossesSwipeListRef = useRef(null)
 
 
     // Fetch initial data
-    // useEffect(() => {
-    // const fetchedAllBossesData = require('../data/bosses.json').data
-    // setMMKVBossesList(fetchedAllBossesData)
-    // setFilteredBosses(fetchedAllBossesData)
-    // }, [])
+    useEffect(() => {
+        const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
+        setMMKVBossesList(fetchedAllBossesData)
+        setFilteredBosses(fetchedAllBossesData)
+    }, [])
 
     // Hide SplashScreen
-    useEffect(() => {
-        SplashScreen.hideAsync()
-    }, [mmkvBossesList])
+    // useEffect(() => {
+    //     SplashScreen.hideAsync()
+    // }, [mmkvBossesList])
 
     // Filter results
     useEffect(() => {
@@ -63,21 +81,27 @@ export default function DatabaseScreen(props) {
         console.log('<========NEW RENDER (DATABASE SCREEN)========>');
     })
 
-    const handleSearch = (queryText) => {
-        setSearchInputText(queryText)
+    const onTouchHandlerItem = (item) => {
+        if (item != mmkvBossesList[0]) {
+            let newBossesList = mmkvBossesList
+            newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(item), 1)[0])
+            setMMKVBossesList(newBossesList);
+            bossesSwipeListRef.current.scrollToIndex({
+                index: 0
+            })
+            props.navigation.navigate('D E A T H S')
+        }
     }
 
-    const renderItem = (obj, rowMap) => (
-        <MemoizedRenderItem
+    const renderItem = (obj, rowMap) => {
+        return <MemoizedRenderItem
             item={obj.item}
-            rowMap={rowMap}
-            navigation={props.navigation}
             deathCountImage={deathCountImage}
-            mmkvBossesList={mmkvBossesList}
-            setMMKVBossesList={setMMKVBossesList}
-            bossesListRef={bossesSwipeListRef}
+            onTouchHandler={onTouchHandlerItem}
+            itemText={_newLineAtComma(obj.item.title)}
         />
-    )
+    }
+
 
     const renderHiddenItem = (data, rowMap) => (
         <MemoizedHiddenRenderItem
@@ -138,14 +162,11 @@ export default function DatabaseScreen(props) {
                     autoCapitalize={'sentences'}
                     autoCorrect={false}
                     value={searchInputText}
-                    onChangeText={handleSearch}
+                    onChangeText={setSearchInputText}
                     placeholder={"Search or add bosses..."}
                     style={styles.searchBox}
                 />
                 <TouchableOpacity
-                    style={{
-
-                    }}
                     onPress={addBossHandler}
                 >
                     <View style={{
@@ -165,7 +186,7 @@ export default function DatabaseScreen(props) {
 
                 </TouchableOpacity>
             </View>
-            <SwipeListView
+            <MemoizedSwipeListView
                 listViewRef={bossesSwipeListRef}
                 style={styles.list}
                 data={filteredBosses}
@@ -187,8 +208,8 @@ export default function DatabaseScreen(props) {
                 onRowDidOpen={onRowDidOpen}
                 friction={600}
                 tension={500}
-                recalculateHiddenLayout={true}
-                extraData={mmkvBossesList}
+            // recalculateHiddenLayout={true}
+            // extraData={mmkvBossesList}
             />
         </View>
     );

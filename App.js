@@ -15,7 +15,7 @@ import { useMMKVNumber } from 'react-native-mmkv';
 
 export default function App() {
 
-    SplashScreen.preventAutoHideAsync();
+    // SplashScreen.preventAutoHideAsync();
 
     // let { height, width } = useWindowDimensions();
 
@@ -56,14 +56,12 @@ export default function App() {
                         }]}
                         blurRadius={0}
                     >
-                        <CurrentBossContext>
-                            <MainTabNavigator style={{
-                                borderRadius: 30,
-                                marginTop: Constants.statusBarHeight,
-                                margin: 20,
-                                backgroundColor: 'rgba(214, 201, 180, 0.1)',
-                            }} />
-                        </CurrentBossContext>
+                        <MainTabNavigator style={{
+                            borderRadius: 30,
+                            marginTop: Constants.statusBarHeight,
+                            margin: 20,
+                            backgroundColor: 'rgba(214, 201, 180, 0.1)',
+                        }} />
                     </ImageBackground>
                 </View>
             </NavigationContainer>
