@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext } from 'react'
+import React, { useEffect, useState, useRef, useContext, useCallback, useMemo } from 'react'
 import {
     Text,
     View,
@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 
 import { useKeepAwake } from 'expo-keep-awake';
-
 import { useMMKVObject } from 'react-native-mmkv';
 
 const MAX_DEATH = 501
@@ -42,7 +41,7 @@ function _newLineAtComma(name) {
     if (index >= 0) {
         newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
     }
-
+    ``
     return newName
 }
 
@@ -50,19 +49,20 @@ let scrollPosition = -1
 
 export default function CounterScreen(props) {
     const [canMomentum, setCanMomentum] = useState(false);
-
     const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
-
     const counterRef = useRef(null)
 
     useKeepAwake();
 
+    const getPreviewBossObject = () => {
+        return mmkvBossesList[0]
+    }
     //Run once after mounting
     useEffect(() => {
         if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
             try {
                 counterRef.current.scrollToIndex({
-                    index: mmkvBossesList[0].deaths
+                    index: getPreviewBossObject().deaths
                 })
             } catch (e) {
                 console.warn('COUNTERREF ERRORO LMAO');
@@ -85,7 +85,6 @@ export default function CounterScreen(props) {
                 try {
                     counterRef.current.scrollToIndex({
                         index: mmkvBossesList[0].deaths,
-                        animated: false,
                     })
                 } catch (e) {
                     console.warn('COUNTERREF ERRORO LMAO');
@@ -106,7 +105,7 @@ export default function CounterScreen(props) {
     }, [mmkvBossesList])
 
 
-    const _incrementCounter = () => {
+    const _incrementCounter = useCallback(() => {
         if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
             let newList = mmkvBossesList
             if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
@@ -122,10 +121,10 @@ export default function CounterScreen(props) {
                 setMMKVBossesList(newList)
             }
         }
-    }
+    }, [mmkvBossesList])
 
     // List Items 
-    const renderItem = ({ item }) =>
+    const renderItem = useCallback(({ item }) =>
     (
         <Pressable onPress={_incrementCounter}>
             <View
@@ -145,14 +144,14 @@ export default function CounterScreen(props) {
                 <Text style={styles.count} adjustsFontSizeToFit allowFontScaling={false} >{item.title}</Text>
             </View>
         </Pressable>
-    )
+    ), [_incrementCounter])
 
 
-    const onScrollFn = () => {
+    const onScrollFn = useCallback(() => {
         setCanMomentum(true)
-    }
+    }, [])
 
-    const onMomentumScrollEndFn = (event) => {
+    const onMomentumScrollEndFn = useCallback((event) => {
         if (canMomentum) {
             let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(ITEM_HEIGHT))
             scrollPosition = floored;
@@ -168,9 +167,9 @@ export default function CounterScreen(props) {
             setMMKVBossesList(newList)
         }
         setCanMomentum(false)
-    }
+    }, [])
 
-    const getItemLayoutFn = (data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index })
+    const getItemLayoutFn = useCallback((data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }), [ITEM_HEIGHT])
 
     return (
         <View style={{
@@ -220,10 +219,7 @@ export default function CounterScreen(props) {
 
                             <FlatList
                                 ref={counterRef}
-                                style={{
-                                    maxHeight: ITEM_HEIGHT,
-                                    width: Dimensions.get('window').width,
-                                }}
+                                style={styles.flatList}
                                 data={ITEM_ARRAY}
                                 renderItem={renderItem}
                                 snapToInterval={ITEM_HEIGHT}
@@ -235,6 +231,7 @@ export default function CounterScreen(props) {
                                 getItemLayout={getItemLayoutFn}
                             // scrollEventThrottle={3}
                             />
+
                         </ImageBackground>
                     </View>
 
@@ -270,7 +267,6 @@ export default function CounterScreen(props) {
                 }}>
                     <Text
                         adjustsFontSizeToFit
-
                         style={styles.bossname}
                     >
                         {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)}
@@ -291,6 +287,10 @@ export default function CounterScreen(props) {
 }
 
 const styles = StyleSheet.create({
+    flatList: {
+        maxHeight: ITEM_HEIGHT,
+        width: Dimensions.get('window').width,
+    },
     count: {
         fontSize: 180,
         textAlign: 'center',

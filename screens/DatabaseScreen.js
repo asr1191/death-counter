@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import {
     Text,
     View,
@@ -12,12 +12,13 @@ import {
 import filter from 'lodash.filter';
 import remove from 'lodash.remove';
 import * as SplashScreen from 'expo-splash-screen';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { useMMKVNumber, useMMKVObject } from 'react-native-mmkv';
 
 import BossRenderItem from '../components/BossRenderItem';
 import BossHiddenRenderItem from '../components/BossHiddenRenderItem';
+import SearchBosses from '../components/SearchBosses';
 
 // Optimization 
 const MemoizedRenderItem = React.memo(BossRenderItem)
@@ -45,9 +46,9 @@ function _newLineAtComma(name) {
 
 export default function DatabaseScreen(props) {
 
-    const [filteredBosses, setFilteredBosses] = useState([])
+    // const [filteredBosses, setFilteredBosses] = useState([])
     const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
-    const [searchInputText, setSearchInputText] = useState('')
+    // const [searchInputText, setSearchInputText] = useState('')
 
     const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
@@ -59,7 +60,7 @@ export default function DatabaseScreen(props) {
     useEffect(() => {
         const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
         setMMKVBossesList(fetchedAllBossesData)
-        setFilteredBosses(fetchedAllBossesData)
+        // setFilteredBosses(fetchedAllBossesData)
     }, [])
 
     // Hide SplashScreen
@@ -68,20 +69,25 @@ export default function DatabaseScreen(props) {
     // }, [mmkvBossesList])
 
     // Filter results
-    useEffect(() => {
-        let newItems = filter(mmkvBossesList, (item) => {
-            let itemText = item.title.toLowerCase();
-            return itemText.includes(searchInputText.toLowerCase())
-        })
-        setFilteredBosses(newItems)
-    }, [searchInputText, mmkvBossesList])
+    // useEffect(() => {
+    //     if (props.navigation.isFocused()) {
+    //         let newItems = filter(mmkvBossesList, (item) => {
+    //             let itemText = item.title.toLowerCase();
+    //             return itemText.includes(searchInputText.toLowerCase())
+    //         })
+    //         setFilteredBosses(newItems)
+    //     } else {
+    //         console.log('ROUTE: %s', props.navigation.isFocused());
+    //         setFilteredBosses(mmkvBossesList)
+    //     }
+    // }, [searchInputText, mmkvBossesList])
 
     // On every Render
     useEffect(() => {
         console.log('<========NEW RENDER (DATABASE SCREEN)========>');
     })
 
-    const onTouchHandlerItem = (item) => {
+    const onTouchHandlerItem = useCallback((item) => {
         if (item != mmkvBossesList[0]) {
             let newBossesList = mmkvBossesList
             newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(item), 1)[0])
@@ -89,22 +95,22 @@ export default function DatabaseScreen(props) {
             bossesSwipeListRef.current.scrollToIndex({
                 index: 0
             })
-            props.navigation.navigate('D E A T H S')
         }
-    }
+        props.navigation.navigate('D E A T H S')
+    }, [mmkvBossesList])
 
-    const renderItem = (obj, rowMap) => {
-        return <MemoizedRenderItem
+    const renderItem = useCallback((obj, rowMap) => {
+        return <BossRenderItem
             item={obj.item}
             deathCountImage={deathCountImage}
             onTouchHandler={onTouchHandlerItem}
             itemText={_newLineAtComma(obj.item.title)}
         />
-    }
+    }, [onTouchHandlerItem])
 
 
-    const renderHiddenItem = (data, rowMap) => (
-        <MemoizedHiddenRenderItem
+    const renderHiddenItem = useCallback((data, rowMap) => (
+        <BossHiddenRenderItem
             data={data}
             rowMap={rowMap}
             mmkvBossesList={mmkvBossesList}
@@ -113,11 +119,11 @@ export default function DatabaseScreen(props) {
             hiddenRowButtonWidth={hiddenRowButtonWidth}
         />
 
-    );
+    ), [mmkvBossesList, hiddenRowButtonWidth])
 
-    const onRowDidOpen = rowKey => {
-        console.log('This row opened', rowKey);
-    };
+    // const onRowDidOpen = rowKey => {
+    //     console.log('This row opened', rowKey);
+    // };
 
     const addBossHandler = () => {
         if (searchInputText.length > 0) {
@@ -131,7 +137,6 @@ export default function DatabaseScreen(props) {
             }
             newList.splice(0, 0, newBoss)
             setMMKVBossesList(newList)
-            setSearchInputText('')
             setNewId(getNewId + 1)
             Keyboard.dismiss()
         }
@@ -139,79 +144,16 @@ export default function DatabaseScreen(props) {
 
 
     return (
-        <View style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <View style={{
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row',
-                paddingVertical: 20,
-                marginBottom: 20,
-                // marginHorizontal: 20,
-                paddingHorizontal: 10,
-                borderBottomColor: 'rgba(243, 211, 158, 0.2)',
-                borderBottomWidth: 1,
-                // borderRadius: 20
-            }}>
-                <TextInput
-                    listViewRef={bossesSwipeListRef}
-                    autoCapitalize={'sentences'}
-                    autoCorrect={false}
-                    value={searchInputText}
-                    onChangeText={setSearchInputText}
-                    placeholder={"Search or add bosses..."}
-                    style={styles.searchBox}
-                />
-                <TouchableOpacity
-                    onPress={addBossHandler}
-                >
-                    <View style={{
-                        borderRadius: 5,
-                        marginLeft: 10,
-                        width: 50,
-                        backgroundColor: 'rgba(243, 211, 158, 1)',
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center'
+        <SearchBosses
+            bossesSwipeListRef={bossesSwipeListRef}
+            mmkvBossesList={mmkvBossesList}
+            renderItem={renderItem}
+            renderHiddenItem={renderHiddenItem}
+            hiddenRowButtonWidth={hiddenRowButtonWidth}
+            // onRowDidOpen={onRowDidOpen}
+            addBossHandler={addBossHandler}
+        />
 
-                        // height: '100%',
-                    }}>
-                        <MaterialIcons name="add" size={35} color="rgba(47, 42, 35, 1)" />
-
-                    </View>
-
-                </TouchableOpacity>
-            </View>
-            <MemoizedSwipeListView
-                listViewRef={bossesSwipeListRef}
-                style={styles.list}
-                data={filteredBosses}
-                renderItem={renderItem}
-                renderHiddenItem={renderHiddenItem}
-                showsVerticalScrollIndicator={false}
-                fadingEdgeLength={50}
-                overScrollMode={'never'}
-                leftOpenValue={hiddenRowButtonWidth}
-                rightOpenValue={-hiddenRowButtonWidth}
-                stopLeftSwipe={hiddenRowButtonWidth * 1.5}
-                stopRightSwipe={-hiddenRowButtonWidth * 1.5}
-                previewRowKey={'2'}
-                previewOpenValue={-40}
-                // previewRepeat={true}
-                // previewDuration={500}
-                // previewRepeatDelay={500}
-                previewOpenDelay={1000}
-                onRowDidOpen={onRowDidOpen}
-                friction={600}
-                tension={500}
-            // recalculateHiddenLayout={true}
-            // extraData={mmkvBossesList}
-            />
-        </View>
     );
 }
 
