@@ -1,69 +1,103 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import {
     StyleSheet,
     View,
     TextInput,
     TouchableOpacity,
+    Keyboard,
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
-// const MemoizedSwipeListView = React.memo(SwipeListView)
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import filter from 'lodash.filter';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useMMKVNumber, useMMKVObject } from 'react-native-mmkv';
+
+import BossRenderItem from './BossRenderItem';
+import BossHiddenRenderItem from './BossHiddenRenderItem';
+import useDBObject from '../hooks/useDBObject';
+
+function _newLineAtComma(name) {
+    let newName = name
+    let index = name.indexOf(',')
+    if (index >= 0) {
+        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
+    }
+    index = name.indexOf('(')
+    if (index >= 0) {
+        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
+    }
+    return newName
+}
+const deathCountImage = require('../assets/floral-death-background.png')
 
 export default function SearchBosses({
     bossesSwipeListRef,
-    mmkvBossesList,
-    renderItem,
-    renderHiddenItem,
-    hiddenRowButtonWidth,
     onRowDidOpen,
-    addBossHandler
+    navigation
 }) {
 
     const [searchInputText, setSearchInputText] = useState('')
-    // let filteredBosses = mmkvBossesList
+    const [mmkvBossesList, setMMKVBossesList] = useDBObject('bosses_list2')
+    const [getNewId, setNewId] = useMMKVNumber('latest_id')
+    // const hiddenRowButtonWidth = useRef(0);
 
-    // useEffect(() => {
-    //     filteredBosses = mmkvBossesList
-    // }, [])
-
-    // useEffect(() => {
-    //     filteredBosses = filter(mmkvBossesList, (item) => {
-    //         let itemText = item.title.toLowerCase()
-    //         return itemText.includes(searchInputText.toLowerCase())
-    //     })
-    // }, [mmkvBossesList, searchInputText])
-
-    const getSearchResults = () => {
+    const getSearchResults = useCallback(() => {
         let filteredBosses = filter(mmkvBossesList, (item) => {
             let itemText = item.title.toLowerCase()
             return itemText.includes(searchInputText.toLowerCase())
         })
-
         return filteredBosses
+    }, [mmkvBossesList])
+
+    const addBossHandler = () => {
+        setMMKVBossesList((prevMMKVBossesList) => {
+            // if (searchInputText.length > 0) {
+            //     let newList = []
+            //     if (prevMMKVBossesList != undefined)
+            //         newList = [...prevMMKVBossesList]
+            //     const newBoss = {
+            //         key: getNewId,
+            //         title: searchInputText,
+            //         deaths: 0
+            //     }
+
+            //     newList.splice(0, 0, newBoss)
+            //     setNewId(getNewId + 1)
+            //     Keyboard.dismiss()
+            //     console.log(prevMMKVBossesList);
+            //     return newList
+
+            // }
+            const blah = [...prevMMKVBossesList]
+            console.log(blah);
+            return blah
+        })
+    }
+
+    const renderItem = (obj, rowMap) => {
+        return <BossRenderItem
+            item={obj.item}
+            deathCountImage={deathCountImage}
+            setMMKVBossesList={setMMKVBossesList}
+            itemText={_newLineAtComma(obj.item.title)}
+            navigation={navigation}
+        />
     }
 
 
+    const renderHiddenItem = (data, rowMap) => (
+        <BossHiddenRenderItem
+            data={data}
+            rowMap={rowMap}
+            setMMKVBossesList={setMMKVBossesList}
+        //     hiddenRowButtonWidth={hiddenRowButtonWidth}
+        />
+
+    )
+
     return (
-        <View style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-        }}>
-            <View style={{
-                width: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexDirection: 'row',
-                paddingVertical: 20,
-                marginBottom: 20,
-                // marginHorizontal: 20,
-                paddingHorizontal: 10,
-                borderBottomColor: 'rgba(243, 211, 158, 0.2)',
-                borderBottomWidth: 1,
-                // borderRadius: 20
-            }}>
+        <View style={styles.container}>
+            <View style={styles.searchContainer}>
                 <TextInput
                     autoCapitalize={'sentences'}
                     autoCorrect={false}
@@ -75,34 +109,24 @@ export default function SearchBosses({
                 <TouchableOpacity
                     onPress={addBossHandler}
                 >
-                    <View style={{
-                        borderRadius: 5,
-                        marginLeft: 10,
-                        width: 50,
-                        backgroundColor: 'rgba(243, 211, 158, 1)',
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                        // height: '100%',
-                    }}>
+                    <View style={styles.button}>
                         <MaterialIcons name="add" size={35} color="rgba(47, 42, 35, 1)" />
-
                     </View>
                 </TouchableOpacity>
             </View>
             <SwipeListView
                 listViewRef={bossesSwipeListRef}
                 style={styles.list}
-                data={getSearchResults()}
+                data={mmkvBossesList}
                 renderItem={renderItem}
                 renderHiddenItem={renderHiddenItem}
                 showsVerticalScrollIndicator={false}
                 fadingEdgeLength={50}
                 overScrollMode={'never'}
-                leftOpenValue={hiddenRowButtonWidth}
-                rightOpenValue={-hiddenRowButtonWidth}
-                stopLeftSwipe={hiddenRowButtonWidth * 1.5}
-                stopRightSwipe={-hiddenRowButtonWidth * 1.5}
+                leftOpenValue={75}
+                rightOpenValue={-75}
+                stopLeftSwipe={75 * 1.5}
+                stopRightSwipe={-75 * 1.5}
                 previewRowKey={'2'}
                 previewOpenValue={-40}
                 // previewRepeat={true}
@@ -112,17 +136,29 @@ export default function SearchBosses({
                 // onRowDidOpen={onRowDidOpen}
                 friction={600}
                 tension={500}
-            // recalculateHiddenLayout={true}
-            // extraData={mmkvBossesList}
             />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    list: {
-        width: '95%',
-        marginBottom: 10
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    searchContainer: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'row',
+        paddingVertical: 20,
+        marginBottom: 20,
+        // marginHorizontal: 20,
+        paddingHorizontal: 10,
+        borderBottomColor: 'rgba(243, 211, 158, 0.2)',
+        borderBottomWidth: 1,
+        // borderRadius: 20
     },
     searchBox: {
         flex: 1,
@@ -135,5 +171,19 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         padding: 5,
         paddingHorizontal: 10
+    },
+    button: {
+        borderRadius: 5,
+        marginLeft: 10,
+        width: 50,
+        backgroundColor: 'rgba(243, 211, 158, 1)',
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+        // height: '100%',
+    },
+    list: {
+        width: '95%',
+        marginBottom: 10
     },
 })

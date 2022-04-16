@@ -19,139 +19,44 @@ import { useMMKVNumber, useMMKVObject } from 'react-native-mmkv';
 import BossRenderItem from '../components/BossRenderItem';
 import BossHiddenRenderItem from '../components/BossHiddenRenderItem';
 import SearchBosses from '../components/SearchBosses';
+import useDBObject from '../hooks/useDBObject';
 
 // Optimization 
 const MemoizedRenderItem = React.memo(BossRenderItem)
 const MemoizedHiddenRenderItem = React.memo(BossHiddenRenderItem)
 const MemoizedSwipeListView = React.memo(SwipeListView)
-const deathCountImage = require('../assets/floral-death-background.png')
-
-
-function _newLineAtComma(name) {
-    let newName = name
-
-    let index = name.indexOf(',')
-    if (index >= 0) {
-        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
-    }
-
-    index = name.indexOf('(')
-    if (index >= 0) {
-        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
-    }
-
-    return newName
-}
 
 
 export default function DatabaseScreen(props) {
 
-    // const [filteredBosses, setFilteredBosses] = useState([])
-    const [hiddenRowButtonWidth, setHiddenRowButtonWidth] = useState(0);
-    // const [searchInputText, setSearchInputText] = useState('')
 
-    const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
-    const [getNewId, setNewId] = useMMKVNumber('latest_id')
+    const [mmkvBossesList, setMMKVBossesList] = useDBObject('bosses_list2')
 
     const bossesSwipeListRef = useRef(null)
 
 
     // Fetch initial data
     useEffect(() => {
-        const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
-        setMMKVBossesList(fetchedAllBossesData)
+        // const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
+        // setMMKVBossesList(fetchedAllBossesData)
         // setFilteredBosses(fetchedAllBossesData)
     }, [])
-
-    // Hide SplashScreen
-    // useEffect(() => {
-    //     SplashScreen.hideAsync()
-    // }, [mmkvBossesList])
-
-    // Filter results
-    // useEffect(() => {
-    //     if (props.navigation.isFocused()) {
-    //         let newItems = filter(mmkvBossesList, (item) => {
-    //             let itemText = item.title.toLowerCase();
-    //             return itemText.includes(searchInputText.toLowerCase())
-    //         })
-    //         setFilteredBosses(newItems)
-    //     } else {
-    //         console.log('ROUTE: %s', props.navigation.isFocused());
-    //         setFilteredBosses(mmkvBossesList)
-    //     }
-    // }, [searchInputText, mmkvBossesList])
 
     // On every Render
     useEffect(() => {
         console.log('<========NEW RENDER (DATABASE SCREEN)========>');
     })
 
-    const onTouchHandlerItem = useCallback((item) => {
-        if (item != mmkvBossesList[0]) {
-            let newBossesList = mmkvBossesList
-            newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(item), 1)[0])
-            setMMKVBossesList(newBossesList);
-            bossesSwipeListRef.current.scrollToIndex({
-                index: 0
-            })
-        }
-        props.navigation.navigate('D E A T H S')
-    }, [mmkvBossesList])
-
-    const renderItem = useCallback((obj, rowMap) => {
-        return <BossRenderItem
-            item={obj.item}
-            deathCountImage={deathCountImage}
-            onTouchHandler={onTouchHandlerItem}
-            itemText={_newLineAtComma(obj.item.title)}
-        />
-    }, [onTouchHandlerItem])
-
-
-    const renderHiddenItem = useCallback((data, rowMap) => (
-        <BossHiddenRenderItem
-            data={data}
-            rowMap={rowMap}
-            mmkvBossesList={mmkvBossesList}
-            setMMKVBossesList={setMMKVBossesList}
-            setHiddenRowButtonWidth={setHiddenRowButtonWidth}
-            hiddenRowButtonWidth={hiddenRowButtonWidth}
-        />
-
-    ), [mmkvBossesList, hiddenRowButtonWidth])
-
     // const onRowDidOpen = rowKey => {
     //     console.log('This row opened', rowKey);
     // };
 
-    const addBossHandler = () => {
-        if (searchInputText.length > 0) {
-            let newList = []
-            if (mmkvBossesList != undefined)
-                newList = mmkvBossesList
-            const newBoss = {
-                key: getNewId,
-                title: searchInputText,
-                deaths: 0
-            }
-            newList.splice(0, 0, newBoss)
-            setMMKVBossesList(newList)
-            setNewId(getNewId + 1)
-            Keyboard.dismiss()
-        }
-    }
-
-
     return (
         <SearchBosses
             bossesSwipeListRef={bossesSwipeListRef}
-            mmkvBossesList={mmkvBossesList}
-            renderItem={renderItem}
-            renderHiddenItem={renderHiddenItem}
-            hiddenRowButtonWidth={hiddenRowButtonWidth}
-            // onRowDidOpen={onRowDidOpen}
-            addBossHandler={addBossHandler}
+            navigation={props.navigation}
+        // hiddenRowButtonWidth={hiddenRowButtonWidth}
+        // onRowDidOpen={onRowDidOpen}
         />
 
     );

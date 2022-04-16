@@ -1,17 +1,27 @@
-import { ImageBackground, StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
+import { useCallback } from 'react'
+import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
+import useDBObject from '../hooks/useDBObject'
 
-export default function BossRenderItem(props) {
+export default function BossRenderItem({ item, deathCountImage, setMMKVBossesList, itemText, navigation }) {
 
-    const handleItemTouch = () => {
-        props.onTouchHandler(props.item)
-    }
+
+    const onTouchHandlerItem = useCallback(() => {
+        setMMKVBossesList((prevList) => {
+            if (item != prevList[0]) {
+                let newBossesList = [...prevList]
+                newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(item), 1)[0])
+                return newBossesList;
+            }
+        })
+        navigation.navigate('D E A T H S')
+    }, [setMMKVBossesList])
 
     return (
-        <TouchableNativeFeedback onPress={handleItemTouch}>
+        <TouchableNativeFeedback onPress={onTouchHandlerItem}>
             <View style={styles.item}>
                 <View style={styles.itemTextContainer}>
                     <View style={styles.itemTextSubContainer}>
-                        <Text style={styles.itemText}>{props.itemText}</Text>
+                        <Text style={styles.itemText}>{itemText}</Text>
                     </View>
                 </View>
                 <View style={styles.itemDeathContainer}>
@@ -22,7 +32,7 @@ export default function BossRenderItem(props) {
                         resizeMode={'contain'}
                     > */}
                     <View style={styles.deathCountTextContainer}>
-                        <Text style={styles.deathCount}>{props.item.deaths}</Text>
+                        <Text style={styles.deathCount}>{item.deaths}</Text>
                     </View>
                     {/* </ImageBackground> */}
                 </View>

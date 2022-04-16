@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useContext, useCallback, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useContext, useCallback } from 'react'
 import {
     Text,
     View,
@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 
 import { useKeepAwake } from 'expo-keep-awake';
-import { useMMKVObject } from 'react-native-mmkv';
+import useDBObject from '../hooks/useDBObject';
+import { BossPreviewContext } from '../contexts/BossPreviewContext';
 
 const MAX_DEATH = 501
 const ITEM_HEIGHT = 200
@@ -49,27 +50,27 @@ let scrollPosition = -1
 
 export default function CounterScreen(props) {
     const [canMomentum, setCanMomentum] = useState(false);
-    const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
+    // const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
+    const [mmkvBossesList, setMMKVBossesList] = useDBObject('bosses_list2')
+    const { previewBossRef, setPreviewBoss } = useContext(BossPreviewContext)
     const counterRef = useRef(null)
 
     useKeepAwake();
 
-    const getPreviewBossObject = () => {
-        return mmkvBossesList[0]
-    }
     //Run once after mounting
     useEffect(() => {
-        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
-            try {
-                counterRef.current.scrollToIndex({
-                    index: getPreviewBossObject().deaths
-                })
-            } catch (e) {
-                console.warn('COUNTERREF ERRORO LMAO');
-            }
+        // if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
+        // console.log(previewBoss);
+        try {
+            counterRef.current.scrollToIndex({
+                index: previewBossRef.current.deaths
+            })
+        } catch (e) {
+            console.warn('COUNTERREF ERRORO LMAO');
         }
+        // }
     },
-        []
+        [previewBossRef.current]
     )
 
 
@@ -78,31 +79,33 @@ export default function CounterScreen(props) {
     })
 
     useEffect(() => {
-        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
-            console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, mmkvBossesList[0].deaths);
-            if (scrollPosition != mmkvBossesList[0].deaths && counterRef.current != null) {
-                console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, mmkvBossesList[0].deaths, mmkvBossesList[0].deaths);
-                try {
-                    counterRef.current.scrollToIndex({
-                        index: mmkvBossesList[0].deaths,
-                    })
-                } catch (e) {
-                    console.warn('COUNTERREF ERRORO LMAO');
-                }
-                scrollPosition = mmkvBossesList[0].deaths
-                console.log('NAVIGATOR: Navigating to DeathsScreen');
-            }
-        } else {
-            console.log('COUNTER: Resetting to zero');
+        // if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
+        console.log('PREVIEW BOSS: %s', previewBossRef.current);
+        console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, previewBossRef.current.deaths);
+        if (scrollPosition != previewBossRef.current.deaths && counterRef.current != null) {
+            console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, previewBossRef.current.deaths, previewBossRef.current.deaths);
             try {
                 counterRef.current.scrollToIndex({
-                    index: 0
+                    index: previewBossRef.current.deaths,
                 })
             } catch (e) {
                 console.warn('COUNTERREF ERRORO LMAO');
             }
+            scrollPosition = previewBossRef.current.deaths
+            console.log('NAVIGATOR: Navigating to DeathsScreen');
         }
-    }, [mmkvBossesList])
+        // } else {
+        //     console.log('COUNTER: Resetting to zero');
+        //     console.log(mmkvBossesList);
+        //     try {
+        //         counterRef.current.scrollToIndex({
+        //             index: 0
+        //         })
+        //     } catch (e) {
+        //         console.warn('COUNTERREF ERRORO LMAO');
+        //     }
+        // }
+    }, [previewBossRef.current])
 
 
     const _incrementCounter = useCallback(() => {
@@ -157,19 +160,23 @@ export default function CounterScreen(props) {
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
-            let newList = mmkvBossesList
-            const newBoss = {
-                key: newList[0].key,
-                title: newList[0].title,
-                deaths: floored
-            }
-            newList.splice(0, 1, newBoss)
-            setMMKVBossesList(newList)
+            setMMKVBossesList(prevList => {
+                let newList = [...prevList]
+                const newBoss = {
+                    key: newList[0].key,
+                    title: newList[0].title,
+                    deaths: floored
+                }
+                newList.splice(0, 1, newBoss)
+                return newList
+            })
         }
         setCanMomentum(false)
-    }, [])
+    }, [setMMKVBossesList])
 
-    const getItemLayoutFn = useCallback((data, index) => ({ length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }), [ITEM_HEIGHT])
+    const getItemLayoutFn = useCallback((data, index) => {
+        return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
+    }, [ITEM_HEIGHT])
 
     return (
         <View style={{
@@ -220,6 +227,7 @@ export default function CounterScreen(props) {
                             <FlatList
                                 ref={counterRef}
                                 style={styles.flatList}
+                                initialScrollIndex={previewBossRef.current.deaths}
                                 data={ITEM_ARRAY}
                                 renderItem={renderItem}
                                 snapToInterval={ITEM_HEIGHT}
@@ -229,6 +237,7 @@ export default function CounterScreen(props) {
                                 onScroll={onScrollFn}
                                 onMomentumScrollEnd={onMomentumScrollEndFn}
                                 getItemLayout={getItemLayoutFn}
+                                extraData={previewBossRef.deaths}
                             // scrollEventThrottle={3}
                             />
 

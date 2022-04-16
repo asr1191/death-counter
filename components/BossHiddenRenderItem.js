@@ -2,39 +2,35 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import remove from 'lodash.remove';
+import { useCallback } from "react";
 
-export default function BossHiddenRenderItem(props) {
+export default function BossHiddenRenderItem({ data, rowMap, setMMKVBossesList }) {
 
-    const closeRow = () => {
-        props.rowMap[props.data.item.key].closeRow()
-    }
+    const closeRow = useCallback(() => {
+        rowMap[data.item.key].closeRow()
+    }, [rowMap, data])
 
-    const deleteRow = () => {
-        const newBosses = props.mmkvBossesList
-        remove(newBosses, (boss) => {
-            if (props.data.item.key == boss.key) {
-                console.log('Deleting item with key (%s)', boss.key);
-                return true
-            } else {
-                return false
-            }
+    const deleteRow = useCallback(() => {
+        setMMKVBossesList((prevList) => {
+            const newBosses = [...prevList]
+            remove(newBosses, (boss) => {
+                if (data.item.key == boss.key) {
+                    console.log('Deleting item with key (%s)', boss.key);
+                    return true
+                } else {
+                    return false
+                }
+            })
+            // console.log(newBosses);
+            return newBosses
         })
-        // console.log(newBosses);
-        props.setMMKVBossesList(newBosses)
-    }
-
-    const hiddenItemOnLayout = (event) => {
-        if (props.hiddenRowButtonWidth == 0) {
-            props.setHiddenRowButtonWidth(event.nativeEvent.layout.width)
-        }
-    }
+    }, [setMMKVBossesList, data])
 
     return (
         <View style={styles.hiddenItem}>
             <TouchableOpacity
                 style={styles.buttonStyle}
                 onPress={closeRow}
-                onLayout={hiddenItemOnLayout}
             >
                 <MaterialCommunityIcons
                     name="sword-cross"
