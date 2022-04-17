@@ -47,6 +47,10 @@ export default function SearchBosses({ navigation }) {
 
     const addBossHandler = () => {
         setDBObj((prevMMKVBossesList) => {
+            if (prevMMKVBossesList.length >= 150) {
+                console.log('BOSSES-LIST: Boss cannot be added! Maximum capacity reached!');
+                return prevMMKVBossesList
+            }
             if (searchInputText.length > 0) {
                 let newList = []
                 if (prevMMKVBossesList != undefined)
