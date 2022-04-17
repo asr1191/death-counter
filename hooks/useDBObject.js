@@ -1,12 +1,12 @@
 import { useContext, useEffect } from "react";
 import { useMMKVString } from "react-native-mmkv";
-import { BossPreviewContext } from "../contexts/BossPreviewContext";
+import { BossContext } from "../contexts/BossContext";
 
 
 export default function useDBObject(key) {
 
     const [str, setStr] = useMMKVString(key)
-    const { previewBoss, setPreviewBoss } = useContext(BossPreviewContext)
+    const { previewBoss, setPreviewBoss } = useContext(BossContext)
 
     useEffect(() => {
         // if(str == undefined || JSON.parse(str).length == 0)

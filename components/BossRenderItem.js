@@ -2,14 +2,28 @@ import { useCallback } from 'react'
 import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
 import useDBObject from '../hooks/useDBObject'
 
-export default function BossRenderItem({ item, deathCountImage, setMMKVBossesList, itemText, navigation }) {
 
+export default function BossRenderItem({ item, rowMap, deathCountImage, setMMKVBossesList, setPreviewBoss, itemText, navigation }) {
+
+
+    const findBossFactory = useCallback((target) => {
+        const findFunction = (element) => {
+            return element.key == target.key
+        }
+        return findFunction
+    })
 
     const onTouchHandlerItem = useCallback(() => {
         setMMKVBossesList((prevList) => {
             if (item != prevList[0]) {
                 let newBossesList = [...prevList]
-                newBossesList.unshift(newBossesList.splice(newBossesList.indexOf(item), 1)[0])
+                // console.log('PREVLIST: %s', prevList[0]);
+                // console.log('ITEM: %s', item);
+                // console.log('ITEM INDEX: %s', newBossesList.findIndex(findBossFactory(item)))
+                // console.log('ROWMAP: %d', Object.keys(rowMap).length);
+                newBossesList.unshift(newBossesList.splice(newBossesList.findIndex(findBossFactory(item)), 1)[0])
+                setPreviewBoss(newBossesList[0])
+                console.log('BOSSESLIST: Shifted boss to top %s', newBossesList[0]);
                 return newBossesList;
             }
         })

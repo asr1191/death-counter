@@ -13,7 +13,7 @@ import {
 
 import { useKeepAwake } from 'expo-keep-awake';
 import useDBObject from '../hooks/useDBObject';
-import { BossPreviewContext } from '../contexts/BossPreviewContext';
+import { BossContext } from '../contexts/BossContext';
 
 const MAX_DEATH = 501
 const ITEM_HEIGHT = 200
@@ -50,9 +50,8 @@ let scrollPosition = -1
 
 export default function CounterScreen(props) {
     const [canMomentum, setCanMomentum] = useState(false);
-    // const [mmkvBossesList, setMMKVBossesList] = useMMKVObject('bosses_list')
-    const [mmkvBossesList, setMMKVBossesList] = useDBObject('bosses_list2')
-    const { previewBossRef, setPreviewBoss } = useContext(BossPreviewContext)
+
+    const { previewBossRef, setPreviewBoss, getDBObj: mmkvBossesList, setDBObj: setMMKVBossesList } = useContext(BossContext)
     const counterRef = useRef(null)
 
     useKeepAwake();
@@ -70,7 +69,7 @@ export default function CounterScreen(props) {
         }
         // }
     },
-        [previewBossRef.current]
+        [previewBossRef]
     )
 
 
@@ -105,7 +104,7 @@ export default function CounterScreen(props) {
         //         console.warn('COUNTERREF ERRORO LMAO');
         //     }
         // }
-    }, [previewBossRef.current])
+    }, [previewBossRef])
 
 
     const _incrementCounter = useCallback(() => {
@@ -278,7 +277,8 @@ export default function CounterScreen(props) {
                         adjustsFontSizeToFit
                         style={styles.bossname}
                     >
-                        {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)}
+                        {/* {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)} */}
+                        {previewBossRef.current.title}
                     </Text>
                 </View>
                 <Image

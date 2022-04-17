@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState, useRef, useContext } from 'react'
 import {
     StyleSheet,
     View,
@@ -10,11 +10,11 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 
 import filter from 'lodash.filter';
 import { MaterialIcons } from '@expo/vector-icons';
-import { useMMKVNumber, useMMKVObject } from 'react-native-mmkv';
+import { useMMKVNumber } from 'react-native-mmkv';
 
 import BossRenderItem from './BossRenderItem';
 import BossHiddenRenderItem from './BossHiddenRenderItem';
-import useDBObject from '../hooks/useDBObject';
+import { BossContext } from '../contexts/BossContext';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -30,55 +30,49 @@ function _newLineAtComma(name) {
 }
 const deathCountImage = require('../assets/floral-death-background.png')
 
-export default function SearchBosses({
-    bossesSwipeListRef,
-    onRowDidOpen,
-    navigation
-}) {
+export default function SearchBosses({ navigation }) {
 
+    const bossesSwipeListRef = useRef(null)
     const [searchInputText, setSearchInputText] = useState('')
-    const [mmkvBossesList, setMMKVBossesList] = useDBObject('bosses_list2')
+    const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
-    // const hiddenRowButtonWidth = useRef(0);
 
     const getSearchResults = useCallback(() => {
-        let filteredBosses = filter(mmkvBossesList, (item) => {
+        let filteredBosses = filter(getDBObj, (item) => {
             let itemText = item.title.toLowerCase()
             return itemText.includes(searchInputText.toLowerCase())
         })
         return filteredBosses
-    }, [mmkvBossesList])
+    }, [getDBObj, searchInputText])
 
     const addBossHandler = () => {
-        setMMKVBossesList((prevMMKVBossesList) => {
-            // if (searchInputText.length > 0) {
-            //     let newList = []
-            //     if (prevMMKVBossesList != undefined)
-            //         newList = [...prevMMKVBossesList]
-            //     const newBoss = {
-            //         key: getNewId,
-            //         title: searchInputText,
-            //         deaths: 0
-            //     }
+        setDBObj((prevMMKVBossesList) => {
+            if (searchInputText.length > 0) {
+                let newList = []
+                if (prevMMKVBossesList != undefined)
+                    newList = [...prevMMKVBossesList]
+                const newBoss = {
+                    key: getNewId,
+                    title: searchInputText,
+                    deaths: 0
+                }
 
-            //     newList.splice(0, 0, newBoss)
-            //     setNewId(getNewId + 1)
-            //     Keyboard.dismiss()
-            //     console.log(prevMMKVBossesList);
-            //     return newList
-
-            // }
-            const blah = [...prevMMKVBossesList]
-            console.log(blah);
-            return blah
+                newList.splice(0, 0, newBoss)
+                setNewId(getNewId + 1)
+                Keyboard.dismiss()
+                console.log('BOSSESLIST: Added new boss. %s', newList.slice(0, 3));
+                return newList
+            }
         })
     }
 
     const renderItem = (obj, rowMap) => {
         return <BossRenderItem
             item={obj.item}
+            rowMap={rowMap}
             deathCountImage={deathCountImage}
-            setMMKVBossesList={setMMKVBossesList}
+            setMMKVBossesList={setDBObj}
+            setPreviewBoss={setPreviewBoss}
             itemText={_newLineAtComma(obj.item.title)}
             navigation={navigation}
         />
@@ -89,7 +83,7 @@ export default function SearchBosses({
         <BossHiddenRenderItem
             data={data}
             rowMap={rowMap}
-            setMMKVBossesList={setMMKVBossesList}
+            setMMKVBossesList={setDBObj}
         //     hiddenRowButtonWidth={hiddenRowButtonWidth}
         />
 
@@ -117,7 +111,7 @@ export default function SearchBosses({
             <SwipeListView
                 listViewRef={bossesSwipeListRef}
                 style={styles.list}
-                data={mmkvBossesList}
+                data={getSearchResults()}
                 renderItem={renderItem}
                 renderHiddenItem={renderHiddenItem}
                 showsVerticalScrollIndicator={false}

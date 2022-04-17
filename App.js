@@ -8,7 +8,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
-import BossPreviewContextProvider from './contexts/BossPreviewContext';
+import BossContextProvider from './contexts/BossContext';
 
 import { useMMKVNumber } from 'react-native-mmkv';
 // import { useMMKV, useMMKVObject } from 'react-native-mmkv';
@@ -56,14 +56,14 @@ export default function App() {
                         }]}
                         blurRadius={0}
                     >
-                        <BossPreviewContextProvider>
+                        <BossContextProvider>
                             <MainTabNavigator style={{
                                 borderRadius: 30,
                                 marginTop: Constants.statusBarHeight,
                                 margin: 20,
                                 backgroundColor: 'rgba(214, 201, 180, 0.1)',
                             }} />
-                        </BossPreviewContextProvider>
+                        </BossContextProvider>
                     </ImageBackground>
                 </View>
             </NavigationContainer>
