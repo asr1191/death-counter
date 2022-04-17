@@ -15,7 +15,7 @@ import { useMMKVNumber } from 'react-native-mmkv';
 
 export default function App() {
 
-    // SplashScreen.preventAutoHideAsync();
+    SplashScreen.preventAutoHideAsync();
 
     // let { height, width } = useWindowDimensions();
 

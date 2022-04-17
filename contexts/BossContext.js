@@ -26,26 +26,28 @@ export default function BossContextProvider(props) {
     }, [_str])
 
     useEffect(() => {
-        // const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
-        // setData(fetchedAllBossesData)
-        // setPreviewBoss(fetchedAllBossesData[0])
+        if (_str == undefined || _str.length == 0) {
+            const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
+            setData(fetchedAllBossesData)
+            setPreviewBoss(fetchedAllBossesData[0])
+        }
     }, [])
 
     const setPreviewBoss = ({ key, title, deaths }) => {
         if (title == undefined || deaths == undefined) {
             console.log('CONTEXT-FUNCTION: Invalid data, resetting.. (%s, %d)', title, deaths);
-            previewBossRef.current = {
+            setSelectedBoss({
                 key: 'lolnoid',
                 title: 'please add/select a boss',
                 deaths: 0
-            }
+            })
         }
         console.log('CONTEXT-FUNCTION: Updating currently selected boss to (%s, %d)', title, deaths);
-        previewBossRef.current = {
+        setSelectedBoss({
             key: key,
             title: title,
             deaths: deaths
-        }
+        })
     }
 
     const setData = (v) => {
@@ -64,9 +66,9 @@ export default function BossContextProvider(props) {
     }
 
     const value = {
-        previewBossRef: previewBossRef,
+        selectedBoss: selectedBoss,
         setPreviewBoss: setPreviewBoss,
-        getDBObj: JSON.parse(_str),
+        getDBObj: _str != undefined ? JSON.parse(_str) : undefined,
         setDBObj: setData
     }
 

@@ -14,20 +14,16 @@ export default function BossRenderItem({ item, rowMap, deathCountImage, setMMKVB
     })
 
     const onTouchHandlerItem = useCallback(() => {
+        navigation.navigate('D E A T H S')
+        setPreviewBoss(item)
         setMMKVBossesList((prevList) => {
             if (item != prevList[0]) {
                 let newBossesList = [...prevList]
-                // console.log('PREVLIST: %s', prevList[0]);
-                // console.log('ITEM: %s', item);
-                // console.log('ITEM INDEX: %s', newBossesList.findIndex(findBossFactory(item)))
-                // console.log('ROWMAP: %d', Object.keys(rowMap).length);
                 newBossesList.unshift(newBossesList.splice(newBossesList.findIndex(findBossFactory(item)), 1)[0])
-                setPreviewBoss(newBossesList[0])
                 console.log('BOSSESLIST: Shifted boss to top %s', newBossesList[0]);
                 return newBossesList;
             }
         })
-        navigation.navigate('D E A T H S')
     }, [setMMKVBossesList])
 
     return (

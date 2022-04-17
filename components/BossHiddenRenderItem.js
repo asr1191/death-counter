@@ -13,13 +13,9 @@ export default function BossHiddenRenderItem({ data, rowMap, setMMKVBossesList }
     const deleteRow = useCallback(() => {
         setMMKVBossesList((prevList) => {
             const newBosses = [...prevList]
+            console.log('BOSSES-LIST: Deleting boss (%s)', data.item.title);
             remove(newBosses, (boss) => {
-                if (data.item.key == boss.key) {
-                    console.log('Deleting item with key (%s)', boss.key);
-                    return true
-                } else {
-                    return false
-                }
+                return data.item.key == boss.key
             })
             // console.log(newBosses);
             return newBosses

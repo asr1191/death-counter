@@ -14,12 +14,14 @@ import {
 import { useKeepAwake } from 'expo-keep-awake';
 import useDBObject from '../hooks/useDBObject';
 import { BossContext } from '../contexts/BossContext';
+import * as SplashScreen from 'expo-splash-screen';
 
 const MAX_DEATH = 501
 const ITEM_HEIGHT = 200
 const ITEM_ARRAY = _initItemArray(MAX_DEATH)
 
 function _initItemArray(maxNumber) {
+    console.log('POPULATING COUNTER LIST YOOOOOOOOOOOOOOOOOOOO');
     items = [];
     for (let index = 0; index < maxNumber; index++) {
         items.push({
@@ -30,28 +32,12 @@ function _initItemArray(maxNumber) {
     return items;
 }
 
-function _newLineAtComma(name) {
-    let newName = name
-
-    let index = name.indexOf(',')
-    if (index >= 0) {
-        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
-    }
-
-    index = name.indexOf('(')
-    if (index >= 0) {
-        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
-    }
-    ``
-    return newName
-}
-
 let scrollPosition = -1
 
 export default function CounterScreen(props) {
     const [canMomentum, setCanMomentum] = useState(false);
 
-    const { previewBossRef, setPreviewBoss, getDBObj: mmkvBossesList, setDBObj: setMMKVBossesList } = useContext(BossContext)
+    const { selectedBoss, setPreviewBoss, setDBObj } = useContext(BossContext)
     const counterRef = useRef(null)
 
     useKeepAwake();
@@ -62,16 +48,18 @@ export default function CounterScreen(props) {
         // console.log(previewBoss);
         try {
             counterRef.current.scrollToIndex({
-                index: previewBossRef.current.deaths
+                index: selectedBoss.deaths
             })
+
         } catch (e) {
             console.warn('COUNTERREF ERRORO LMAO');
         }
-        // }
-    },
-        [previewBossRef]
-    )
 
+        // }
+        SplashScreen.hideAsync()
+    },
+        []
+    )
 
     useEffect(() => {
         console.log('<========NEW RENDER (COUNTER SCREEN)========>');
@@ -79,18 +67,18 @@ export default function CounterScreen(props) {
 
     useEffect(() => {
         // if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
-        console.log('PREVIEW BOSS: %s', previewBossRef.current);
-        console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, previewBossRef.current.deaths);
-        if (scrollPosition != previewBossRef.current.deaths && counterRef.current != null) {
-            console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, previewBossRef.current.deaths, previewBossRef.current.deaths);
+        console.log('PREVIEW BOSS: %s', selectedBoss);
+        console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, selectedBoss.deaths);
+        if (scrollPosition != selectedBoss.deaths && counterRef.current != null) {
+            console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, selectedBoss.deaths, selectedBoss.deaths);
             try {
                 counterRef.current.scrollToIndex({
-                    index: previewBossRef.current.deaths,
+                    index: selectedBoss.deaths,
                 })
             } catch (e) {
                 console.warn('COUNTERREF ERRORO LMAO');
             }
-            scrollPosition = previewBossRef.current.deaths
+            scrollPosition = selectedBoss.deaths
             console.log('NAVIGATOR: Navigating to DeathsScreen');
         }
         // } else {
@@ -104,37 +92,43 @@ export default function CounterScreen(props) {
         //         console.warn('COUNTERREF ERRORO LMAO');
         //     }
         // }
-    }, [previewBossRef])
+
+    }, [selectedBoss, counterRef])
 
 
     const _incrementCounter = useCallback(() => {
-        if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
-            let newList = mmkvBossesList
-            if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
-                console.log('COUNTER: Incrementing to %d', newList[0].deaths + 1);
-
-                const newBoss = {
-                    key: newList[0].key,
-                    title: newList[0].title,
-                    deaths: newList[0].deaths + 1
-                }
-
-                newList.splice(0, 1, newBoss)
-                setMMKVBossesList(newList)
-            }
+        try {
+            counterRef.current.scrollToIndex({
+                index: scrollPosition + 1
+            })
+        } catch (e) {
+            console.warn('COUNTERREF ERRORO LMAO');
         }
-    }, [mmkvBossesList])
+        scrollPosition += 1
+        setDBObj((prev) => {
+            let newList = [...prev]
+            if (prev != undefined && prev != 0) {
+                if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
+                    console.log('COUNTER: Incrementing to %d', newList[0].deaths + 1);
+
+                    const newBoss = {
+                        key: newList[0].key,
+                        title: newList[0].title,
+                        deaths: newList[0].deaths + 1
+                    }
+
+                    newList.splice(0, 1, newBoss)
+                    return newList
+                }
+            }
+        })
+    }, [setDBObj, counterRef, scrollPosition])
 
     // List Items 
     const renderItem = useCallback(({ item }) =>
     (
         <Pressable onPress={_incrementCounter}>
             <View
-                // onLayout={(event) => {
-                //     if (height < 0) {
-                //         setHeight(event.nativeEvent.layout.height)
-                //     }
-                // }}
                 style={{
                     flex: 1,
                     justifyContent: 'center',
@@ -159,7 +153,7 @@ export default function CounterScreen(props) {
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
-            setMMKVBossesList(prevList => {
+            setDBObj(prevList => {
                 let newList = [...prevList]
                 const newBoss = {
                     key: newList[0].key,
@@ -171,7 +165,7 @@ export default function CounterScreen(props) {
             })
         }
         setCanMomentum(false)
-    }, [setMMKVBossesList])
+    }, [setDBObj, canMomentum])
 
     const getItemLayoutFn = useCallback((data, index) => {
         return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
@@ -226,7 +220,7 @@ export default function CounterScreen(props) {
                             <FlatList
                                 ref={counterRef}
                                 style={styles.flatList}
-                                initialScrollIndex={previewBossRef.current.deaths}
+                                initialScrollIndex={selectedBoss.deaths}
                                 data={ITEM_ARRAY}
                                 renderItem={renderItem}
                                 snapToInterval={ITEM_HEIGHT}
@@ -236,7 +230,6 @@ export default function CounterScreen(props) {
                                 onScroll={onScrollFn}
                                 onMomentumScrollEnd={onMomentumScrollEndFn}
                                 getItemLayout={getItemLayoutFn}
-                                extraData={previewBossRef.deaths}
                             // scrollEventThrottle={3}
                             />
 
@@ -278,7 +271,7 @@ export default function CounterScreen(props) {
                         style={styles.bossname}
                     >
                         {/* {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)} */}
-                        {previewBossRef.current.title}
+                        {selectedBoss.title}
                     </Text>
                 </View>
                 <Image
