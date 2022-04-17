@@ -44,8 +44,6 @@ export default function CounterScreen(props) {
 
     //Run once after mounting
     useEffect(() => {
-        // if (mmkvBossesList != undefined && mmkvBossesList.length != 0) {
-        // console.log(previewBoss);
         try {
             counterRef.current.scrollToIndex({
                 index: selectedBoss.deaths
@@ -54,8 +52,6 @@ export default function CounterScreen(props) {
         } catch (e) {
             console.warn('COUNTERREF ERRORO LMAO');
         }
-
-        // }
         SplashScreen.hideAsync()
     },
         []
@@ -270,7 +266,6 @@ export default function CounterScreen(props) {
                         adjustsFontSizeToFit
                         style={styles.bossname}
                     >
-                        {/* {mmkvBossesList == undefined || mmkvBossesList.length == 0 ? 'please add a boss' : _newLineAtComma(mmkvBossesList[0].title)} */}
                         {selectedBoss.title}
                     </Text>
                 </View>

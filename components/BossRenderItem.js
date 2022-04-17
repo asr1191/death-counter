@@ -27,7 +27,7 @@ export default function BossRenderItem({ item, rowMap, deathCountImage, setMMKVB
     }, [setMMKVBossesList])
 
     return (
-        <TouchableNativeFeedback onPress={onTouchHandlerItem}>
+        <TouchableNativeFeedback onPress={onTouchHandlerItem} >
             <View style={styles.item}>
                 <View style={styles.itemTextContainer}>
                     <View style={styles.itemTextSubContainer}>

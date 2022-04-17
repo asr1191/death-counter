@@ -11,14 +11,11 @@ import MainTabNavigator from './navigators/MainTabNavigator'
 import BossContextProvider from './contexts/BossContext';
 
 import { useMMKVNumber } from 'react-native-mmkv';
-// import { useMMKV, useMMKVObject } from 'react-native-mmkv';
 
 export default function App() {
 
     SplashScreen.preventAutoHideAsync();
-
     // let { height, width } = useWindowDimensions();
-
     const [loaded] = useFonts({
         RomanAntique: require('./assets/fonts/RomanAntique.ttf'),
         OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')

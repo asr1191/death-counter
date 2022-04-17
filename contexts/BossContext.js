@@ -3,51 +3,47 @@ import { useMMKVString } from "react-native-mmkv";
 
 export const BossContext = createContext({})
 
+const defaultBoss = {
+    key: 'lolnoid',
+    title: 'please add/select a boss',
+    deaths: 0
+}
+
 export default function BossContextProvider(props) {
 
     const [_str, _setStr] = useMMKVString('bosses_list2')
-    const [selectedBoss, setSelectedBoss] = useState({
-        key: 'lolnoid',
-        title: 'please add/select a boss',
-        deaths: 0
-    })
+    const [selectedBoss, setSelectedBoss] = useState(defaultBoss)
 
-    const previewBossRef = useRef({
-        key: 'lolnoid',
-        title: 'please add/select a boss',
-        deaths: 0
-    })
-
-    useEffect(() => {
-        if (previewBossRef.current.key == 'lolnoid') {
-            console.log('INIT: Setting previewBoss as %s', JSON.parse(_str)[0]);
-            setPreviewBoss(JSON.parse(_str)[0])
-        }
-    }, [_str])
+    const previewBossRef = useRef(defaultBoss)
 
     useEffect(() => {
         if (_str == undefined || _str.length == 0) {
             const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
             setData(fetchedAllBossesData)
-            setPreviewBoss(fetchedAllBossesData[0])
+            setSelectedBossWrapper(fetchedAllBossesData)
         }
     }, [])
 
-    const setPreviewBoss = ({ key, title, deaths }) => {
-        if (title == undefined || deaths == undefined) {
-            console.log('CONTEXT-FUNCTION: Invalid data, resetting.. (%s, %d)', title, deaths);
+    useEffect(() => {
+        if (previewBossRef.current.key == 'lolnoid' && _str != null) {
+            console.log('INIT: Setting previewBoss as %s', JSON.parse(_str)[0]);
+            setSelectedBossWrapper(JSON.parse(_str)[0])
+        }
+    }, [_str])
+
+    const setSelectedBossWrapper = (boss) => {
+        if (boss != undefined) {
+            if (boss.title == undefined || boss.deaths == undefined) {
+                console.log('CONTEXT-FUNCTION: Invalid setSelectedBoss params, resetting..');
+                setSelectedBoss(defaultBoss)
+            }
+            console.log('CONTEXT-FUNCTION: Updating currently selected boss to (%s, %d)', boss.title, boss.deaths);
             setSelectedBoss({
-                key: 'lolnoid',
-                title: 'please add/select a boss',
-                deaths: 0
+                key: boss.key,
+                title: boss.title,
+                deaths: boss.deaths
             })
         }
-        console.log('CONTEXT-FUNCTION: Updating currently selected boss to (%s, %d)', title, deaths);
-        setSelectedBoss({
-            key: key,
-            title: title,
-            deaths: deaths
-        })
     }
 
     const setData = (v) => {
@@ -67,7 +63,7 @@ export default function BossContextProvider(props) {
 
     const value = {
         selectedBoss: selectedBoss,
-        setPreviewBoss: setPreviewBoss,
+        setPreviewBoss: setSelectedBossWrapper,
         getDBObj: _str != undefined ? JSON.parse(_str) : undefined,
         setDBObj: setData
     }
