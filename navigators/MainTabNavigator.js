@@ -36,24 +36,26 @@ export default function MainTabNavigator(props) {
                 tabBarLabelStyle: {
                     fontFamily: 'RomanAntique',
                     fontSize: 15,
-
                 },
                 tabBarActiveTintColor: '#F3D39E',
                 tabBarIndicatorContainerStyle: {
-                    width: '60%',
+                    width: '100%',
                     alignSelf: 'center',
-                    left: '10%',
-                    bottom: '25%'
+                    borderRadius: 30,
                 },
                 tabBarIndicatorStyle: {
-                    backgroundColor: '#F3D39E',
-                    borderRadius: 30
+                    backgroundColor: '#rgba(243, 211, 158, 0.2)',
+                    borderRadius: 30,
+                    height: '100%'
                 },
             }}
         >
             <Tab.Screen
                 name="D E A T H S"
                 component={CounterScreen}
+                options={{
+                    swipeEnabled: false
+                }}
             />
             <Tab.Screen
                 name="B O S S E S"

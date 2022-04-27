@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
-import useDBObject from '../hooks/useDBObject'
 
 
 export default function BossRenderItem({ item, rowMap, deathCountImage, setMMKVBossesList, setPreviewBoss, itemText, navigation }) {

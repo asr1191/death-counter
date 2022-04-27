@@ -5,6 +5,8 @@ import {
     TextInput,
     TouchableOpacity,
     Keyboard,
+    ToastAndroid,
+    Image
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 
@@ -29,6 +31,7 @@ function _newLineAtComma(name) {
     return newName
 }
 const deathCountImage = require('../assets/floral-death-background.png')
+const footerImage = require('../assets/floral-boss-list-footer2.png')
 
 export default function SearchBosses({ navigation }) {
 
@@ -36,6 +39,10 @@ export default function SearchBosses({ navigation }) {
     const [searchInputText, setSearchInputText] = useState('')
     const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
+
+    useEffect(() => {
+        console.log('BOSSES-LIST: Next ID to be inserted (%d)', getNewId);
+    }, [getNewId])
 
     const getSearchResults = useCallback(() => {
         let filteredBosses = filter(getDBObj, (item) => {
@@ -47,8 +54,9 @@ export default function SearchBosses({ navigation }) {
 
     const addBossHandler = () => {
         setDBObj((prevMMKVBossesList) => {
-            if (prevMMKVBossesList.length >= 150) {
+            if (prevMMKVBossesList != undefined && prevMMKVBossesList.length >= 150) {
                 console.log('BOSSES-LIST: Boss cannot be added! Maximum capacity reached!');
+                ToastAndroid.show('Boss cannot be added! Maximum capacity reached!', ToastAndroid.LONG)
                 return prevMMKVBossesList
             }
             if (searchInputText.length > 0) {
@@ -56,19 +64,34 @@ export default function SearchBosses({ navigation }) {
                 if (prevMMKVBossesList != undefined)
                     newList = [...prevMMKVBossesList]
                 const newBoss = {
-                    key: getNewId,
-                    title: searchInputText,
+                    key: getNewId.toString(),
+                    title: searchInputText.trim(),
                     deaths: 0
                 }
-
                 newList.splice(0, 0, newBoss)
-                setNewId(getNewId + 1)
                 Keyboard.dismiss()
+
+                setNewId(getNewId + 1)
+
+                console.log('BOSSESLIST: Setting preview boss. %s', newBoss)
+                setPreviewBoss(newBoss)
+
                 console.log('BOSSESLIST: Added new boss. %s', newList.slice(0, 3));
                 return newList
             }
         })
+        setSearchInputText('')
     }
+
+    const listFooterComponent = useCallback(() => (
+        <View style={styles.alignCenter}>
+            <Image
+                source={footerImage}
+                resizeMode={'contain'}
+                style={styles.footerImage}
+            />
+        </View>
+    ))
 
     const renderItem = (obj, rowMap) => {
         return <BossRenderItem
@@ -87,7 +110,8 @@ export default function SearchBosses({ navigation }) {
         <BossHiddenRenderItem
             data={data}
             rowMap={rowMap}
-            setMMKVBossesList={setDBObj}
+            setDBObj={setDBObj}
+            setPreviewBoss={setPreviewBoss}
         //     hiddenRowButtonWidth={hiddenRowButtonWidth}
         />
 
@@ -97,12 +121,15 @@ export default function SearchBosses({ navigation }) {
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <TextInput
-                    autoCapitalize={'sentences'}
+                    autoCapitalize={'words'}
                     autoCorrect={false}
                     value={searchInputText}
                     onChangeText={setSearchInputText}
                     placeholder={"Search or add bosses..."}
                     style={styles.searchBox}
+                    returnKeyType={'search'}
+                    selectionColor={'rgba(243, 211, 158, 0.4)'}
+                    maxLength={50}
                 />
                 <TouchableOpacity
                     onPress={addBossHandler}
@@ -118,6 +145,7 @@ export default function SearchBosses({ navigation }) {
                 data={getSearchResults()}
                 renderItem={renderItem}
                 renderHiddenItem={renderHiddenItem}
+                ListFooterComponent={listFooterComponent}
                 showsVerticalScrollIndicator={false}
                 fadingEdgeLength={50}
                 overScrollMode={'never'}
@@ -125,21 +153,30 @@ export default function SearchBosses({ navigation }) {
                 rightOpenValue={-75}
                 stopLeftSwipe={75 * 1.5}
                 stopRightSwipe={-75 * 1.5}
-                previewRowKey={'2'}
+                previewRowKey={(getNewId - 1).toString()}
                 previewOpenValue={-40}
                 // previewRepeat={true}
-                // previewDuration={500}
+                // previewDuration={2000}
                 // previewRepeatDelay={500}
-                previewOpenDelay={1000}
+                previewOpenDelay={250}
                 // onRowDidOpen={onRowDidOpen}
                 friction={600}
                 tension={500}
+                disableRightSwipe={true}
             />
         </View>
     )
 }
 
 const styles = StyleSheet.create({
+    alignCenter: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    footerImage: {
+        height: 60,
+        opacity: 0.8
+    },
     container: {
         flex: 1,
         alignItems: 'center',

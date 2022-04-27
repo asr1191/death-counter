@@ -4,23 +4,25 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import remove from 'lodash.remove';
 import { useCallback } from "react";
 
-export default function BossHiddenRenderItem({ data, rowMap, setMMKVBossesList }) {
+export default function BossHiddenRenderItem({ data, rowMap, setDBObj, setPreviewBoss }) {
 
     const closeRow = useCallback(() => {
         rowMap[data.item.key].closeRow()
     }, [rowMap, data])
 
     const deleteRow = useCallback(() => {
-        setMMKVBossesList((prevList) => {
+        setDBObj((prevList) => {
             const newBosses = [...prevList]
             console.log('BOSSES-LIST: Deleting boss (%s)', data.item.title);
             remove(newBosses, (boss) => {
                 return data.item.key == boss.key
             })
-            // console.log(newBosses);
+            if (newBosses.length == 0) {
+                setPreviewBoss(undefined)
+            }
             return newBosses
         })
-    }, [setMMKVBossesList, data])
+    }, [setPreviewBoss, setDBObj, data])
 
     return (
         <View style={styles.hiddenItem}>

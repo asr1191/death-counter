@@ -14,18 +14,16 @@ export default function BossContextProvider(props) {
     const [_str, _setStr] = useMMKVString('bosses_list2')
     const [selectedBoss, setSelectedBoss] = useState(defaultBoss)
 
-    const previewBossRef = useRef(defaultBoss)
+    // useEffect(() => {
+    // if (_str == undefined || _str.length == 0) {
+    // const fetchedAllBossesData = require('../data/bosses.json').data
+    // setData(fetchedAllBossesData)
+    // setSelectedBossWrapper(fetchedAllBossesData[0])
+    // }
+    // }, [])
 
     useEffect(() => {
-        if (_str == undefined || _str.length == 0) {
-            const fetchedAllBossesData = require('../data/MOCK_DATA.json').data
-            setData(fetchedAllBossesData)
-            setSelectedBossWrapper(fetchedAllBossesData)
-        }
-    }, [])
-
-    useEffect(() => {
-        if (previewBossRef.current.key == 'lolnoid' && _str != null) {
+        if (selectedBoss.key == 'lolnoid' && _str != null) {
             console.log('INIT: Setting previewBoss as %s', JSON.parse(_str)[0]);
             setSelectedBossWrapper(JSON.parse(_str)[0])
         }
@@ -43,6 +41,9 @@ export default function BossContextProvider(props) {
                 title: boss.title,
                 deaths: boss.deaths
             })
+        } else {
+            console.log('CONTEXT-FUNCTION: Updating previewBoss to default');
+            setSelectedBoss(defaultBoss)
         }
     }
 
@@ -71,3 +72,4 @@ export default function BossContextProvider(props) {
     return <BossContext.Provider value={value}>{props.children}</BossContext.Provider>
 
 }
+

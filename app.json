@@ -1,17 +1,21 @@
 {
   "expo": {
-    "name": "death-counter",
-    "slug": "death-counter",
+    "name": "Death Tracker",
+    "slug": "death-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "splash": {
       "resizeMode": "cover",
       "backgroundColor": "#030303",
-      "image": "./assets/death-counter-splash.png"
+      "image": "./assets/death-tracker-splash2.png"
     },
+    "icon": "./assets/death-counter-adaptivelogo3.png",
     "android": {
-      "package": "com.vindveil.deathcounter",
-      "softwareKeyboardLayoutMode": "pan"
+      "package": "com.amalsraj.deathtracker",
+      "softwareKeyboardLayoutMode": "pan",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/death-counter-adaptivelogo3.png"
+      }
     }
   },
   "updates": {
@@ -25,9 +29,10 @@
   },
   "android": {
     "adaptiveIcon": {
+      "foregroundImage": "./assets/death-counter-adaptivelogo3.png",
       "backgroundColor": "#FFFFFF"
     },
-    "package": "com.vindveil.deathcounter"
+    "package": "com.amalsraj.deathtracker"
   },
   "web": {}
 }
