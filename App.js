@@ -21,13 +21,14 @@ export default function App() {
         OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
     });
 
-    const [setNewId, getNewId] = useMMKVNumber('latest_id')
+    const [getNewId, setNewId] = useMMKVNumber('latest_id')
 
     useEffect(() => {
-        if (setNewId == undefined) {
-            getNewId(0)
+        if (getNewId == undefined) {
+            setNewId(0)
         }
-    }, [setNewId])
+        // setNewId(undefined)
+    }, [getNewId, setNewId])
 
     if (loaded) {
 
