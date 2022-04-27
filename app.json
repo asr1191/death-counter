@@ -15,7 +15,8 @@
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/death-counter-adaptivelogo3.png"
-      }
+      },
+      "permissions": []
     }
   },
   "updates": {
