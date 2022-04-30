@@ -18,7 +18,7 @@ Link to the privacy policy of some third-party service providers used by the app
 *   [AdMob](https://support.google.com/admob/answer/6128543?hl=en)
 *   [Expo](https://expo.io/privacy)
 
-# Service Providers
+## Service Providers
 
 I may employ third-party companies and individuals due to the following reasons:
 
