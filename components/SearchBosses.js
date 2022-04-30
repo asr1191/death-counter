@@ -16,6 +16,7 @@ import { useMMKVNumber } from 'react-native-mmkv';
 import BossRenderItem from './BossRenderItem';
 import BossHiddenRenderItem from './BossHiddenRenderItem';
 import { BossContext } from '../contexts/BossContext';
+import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -38,6 +39,10 @@ export default function SearchBosses({ navigation }) {
     const [searchInputText, setSearchInputText] = useState('')
     const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
+
+    useEffect(() => {
+        setTestDeviceIDAsync("EMULATOR");
+    }, [])
 
     useEffect(() => {
         console.log('BOSSES-LIST: Next ID to be inserted (%d)', getNewId);
@@ -162,6 +167,12 @@ export default function SearchBosses({ navigation }) {
                 friction={600}
                 tension={500}
                 disableRightSwipe={true}
+            />
+            <AdMobBanner
+                bannerSize='banner'
+                adUnitID='ca-app-pub-3940256099942544/6300978111'
+                servePersonalizedAds // true or false
+                onDidFailToReceiveAdWithError={(e) => console.log(e)}
             />
         </View>
     )

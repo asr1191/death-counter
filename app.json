@@ -16,7 +16,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/death-counter-adaptivelogo3.png"
       },
-      "permissions": []
+      "permissions": [
+        "INTERNET"
+      ],
+      "config": {
+        "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
+      }
     }
   },
   "updates": {
@@ -25,15 +30,14 @@
   "assetBundlePatterns": [
     "**/*"
   ],
-  "ios": {
-    "supportsTablet": true
-  },
   "android": {
     "adaptiveIcon": {
       "foregroundImage": "./assets/death-counter-adaptivelogo3.png",
       "backgroundColor": "#FFFFFF"
     },
-    "package": "com.amalsraj.deathtracker"
-  },
-  "web": {}
+    "package": "com.amalsraj.deathtracker",
+    "config": {
+      "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
+    }
+  }
 }
