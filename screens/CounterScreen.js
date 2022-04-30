@@ -86,8 +86,8 @@ export default function CounterScreen() {
         }
         scrollPosition += 1
         setDBObj((prev) => {
-            let newList = [...prev]
             if (prev != undefined && prev != 0) {
+                let newList = [...prev]
                 if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
                     console.log('COUNTER: Incrementing to %d', newList[0].deaths + 1);
 
@@ -108,8 +108,14 @@ export default function CounterScreen() {
     const renderItem = useCallback(({ item }) =>
     (
         <Pressable onPress={_incrementCounter}>
-            <View style={styles.countContainer}>
-                <Text style={styles.count} adjustsFontSizeToFit allowFontScaling={false} >{item.title}</Text>
+            <View style={styles.countContainer} >
+                <Text
+                    style={styles.count}
+                    adjustsFontSizeToFit
+                    allowFontScaling={false}
+                >
+                    {item.title}
+                </Text>
             </View>
         </Pressable>
     ), [_incrementCounter])
@@ -120,13 +126,13 @@ export default function CounterScreen() {
 
     const onMomentumScrollEndFn = useCallback((event) => {
         if (canMomentum) {
-            let floored = Math.floor(Math.floor(event.nativeEvent.contentOffset.y) / Math.floor(ITEM_HEIGHT))
+            let floored = Math.floor((event.nativeEvent.contentOffset.y + 100) / ITEM_HEIGHT)
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
             setDBObj(prevList => {
-                let newList = [...prevList]
-                if (newList != undefined && newList.length > 0) {
+                if (prevList != undefined && prevList.length > 0) {
+                    let newList = [...prevList]
                     const newBoss = {
                         key: newList[0].key,
                         title: newList[0].title,
@@ -142,7 +148,7 @@ export default function CounterScreen() {
 
     const getItemLayoutFn = useCallback((data, index) => {
         return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
-    }, [ITEM_HEIGHT])
+    }, [])
 
     return (
         <View style={{
@@ -261,8 +267,8 @@ export default function CounterScreen() {
 
 const styles = StyleSheet.create({
     flatList: {
-        maxHeight: ITEM_HEIGHT,
         width: Dimensions.get('window').width,
+        maxHeight: ITEM_HEIGHT
     },
     countContainer: {
         flex: 1,
@@ -278,7 +284,8 @@ const styles = StyleSheet.create({
         fontFamily: 'OptimusPrinceps',
         width: '100%',
         textShadowColor: '#BB8D43',
-        textShadowRadius: 30
+        textShadowRadius: 30,
+        height: ITEM_HEIGHT
 
     },
     deaths: {
