@@ -9,12 +9,13 @@
       "backgroundColor": "#030303",
       "image": "./assets/death-tracker-splash2.png"
     },
-    "icon": "./assets/death-counter-adaptivelogo3.png",
+    "icon": "./assets/death-counter-adaptivelogo4.png",
     "android": {
       "package": "com.amalsraj.deathtracker",
+      "versionCode": 2,
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/death-counter-adaptivelogo3.png"
+        "foregroundImage": "./assets/death-counter-adaptivelogo4.png"
       },
       "permissions": [
         "INTERNET"
@@ -32,7 +33,7 @@
   ],
   "android": {
     "adaptiveIcon": {
-      "foregroundImage": "./assets/death-counter-adaptivelogo3.png",
+      "foregroundImage": "./assets/death-counter-adaptivelogo4.png",
       "backgroundColor": "#FFFFFF"
     },
     "package": "com.amalsraj.deathtracker",

@@ -6,7 +6,9 @@ import {
     TouchableOpacity,
     Keyboard,
     ToastAndroid,
-    Image
+    Image,
+    Text,
+    ImageBackground
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import filter from 'lodash.filter';
@@ -39,6 +41,7 @@ export default function SearchBosses({ navigation }) {
     const [searchInputText, setSearchInputText] = useState('')
     const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
     const [getNewId, setNewId] = useMMKVNumber('latest_id')
+    const [isFreeUser, setUserPrivilege] = useState(true)
 
     useEffect(() => {
         setTestDeviceIDAsync("EMULATOR");
@@ -168,12 +171,35 @@ export default function SearchBosses({ navigation }) {
                 tension={500}
                 disableRightSwipe={true}
             />
-            <AdMobBanner
-                bannerSize='banner'
-                adUnitID='ca-app-pub-3940256099942544/6300978111'
-                servePersonalizedAds // true or false
-                onDidFailToReceiveAdWithError={(e) => console.log(e)}
-            />
+            {isFreeUser && <View style={[styles.alignCenter, { width: '100%' }]}>
+                <View style={[styles.contributeContainer, styles.alignCenter]}>
+                    <ImageBackground
+                        style={{
+                            // width: '100%',
+                            width: '100%',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                        imageStyle={{
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                            // opacity: 0.8
+                            // height: '100%',
+                        }}
+                        resizeMode={'stretch'}
+                        source={require('../assets/count-glow-2.png')}
+                    >
+                        <Text style={styles.contribute}>CONTRIBUTE / REMOVE ADS</Text>
+                    </ImageBackground>
+                </View>
+                <AdMobBanner
+                    bannerSize='banner'
+                    adUnitID='ca-app-pub-3940256099942544/6300978111'
+                    servePersonalizedAds // true or false
+                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
+                />
+            </View>}
+
         </View>
     )
 }
@@ -229,6 +255,16 @@ const styles = StyleSheet.create({
     },
     list: {
         width: '95%',
-        marginBottom: 10
+        marginBottom: 15
     },
+    contribute: {
+        fontFamily: 'RomanAntique',
+        color: 'rgb(243,211,158)',
+        textShadowColor: 'rgb(243,211,158)',
+        textShadowRadius: 15
+    },
+    contributeContainer: {
+        marginBottom: 15,
+        width: '100%'
+    }
 })
