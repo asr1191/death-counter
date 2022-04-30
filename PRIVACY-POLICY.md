@@ -4,7 +4,7 @@ I, **Amal S Raj** built the **Death Tracker of Elden Ring** app as an Ad Support
 
 This page is used to inform users regarding my policies with the collection, use, and disclosure of Personal Information if anyone decided to use my app.
 
-If you choose to use my app, then you agree to the collection and use of information in relation to this policy. No personal identifiable information is being sent back to me, while you use the app. The data regarding the bosses and their death count that you provide yourself is will be stored on your phone.
+If you choose to use my app, then you agree to the collection and use of information in relation to this policy. No personal identifiable information is being sent back to me, while you use the app. The data regarding the bosses and their death count that you provide yourself will be stored on your phone.
 
 ## Information Collection and Use
 
