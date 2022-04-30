@@ -9,7 +9,6 @@ import {
     Image
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
 import filter from 'lodash.filter';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMMKVNumber } from 'react-native-mmkv';
@@ -125,7 +124,7 @@ export default function SearchBosses({ navigation }) {
                     autoCorrect={false}
                     value={searchInputText}
                     onChangeText={setSearchInputText}
-                    placeholder={"Search or add bosses..."}
+                    placeholder={"Add or Search your bosses..."}
                     style={styles.searchBox}
                     returnKeyType={'search'}
                     selectionColor={'rgba(243, 211, 158, 0.4)'}
