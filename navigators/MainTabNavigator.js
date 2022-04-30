@@ -21,6 +21,7 @@ export default function MainTabNavigator(props) {
                 }
             }
             screenOptions={{
+                tabBarPressColor: 'transparent',
                 tabBarScrollEnabled: false,
                 tabBarStyle: {
                     backgroundColor: '#453d30',
