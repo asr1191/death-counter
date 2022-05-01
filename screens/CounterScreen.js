@@ -78,7 +78,7 @@ export default function CounterScreen() {
 
 
     const _incrementCounter = useCallback(() => {
-        Vibration.vibrate(250, false)
+        Vibration.vibrate(100, false)
         try {
             counterRef.current.scrollToIndex({
                 index: scrollPosition + 1
@@ -132,7 +132,7 @@ export default function CounterScreen() {
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
-            Vibration.vibrate(250, false)
+            Vibration.vibrate(100, false)
             setDBObj(prevList => {
                 if (prevList != undefined && prevList.length > 0) {
                     let newList = [...prevList]

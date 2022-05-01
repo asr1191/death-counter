@@ -8,7 +8,9 @@ import {
     ToastAndroid,
     Image,
     Text,
-    ImageBackground
+    ImageBackground,
+    Pressable,
+    Vibration
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import filter from 'lodash.filter';
@@ -58,6 +60,10 @@ export default function SearchBosses({ navigation }) {
         })
         return filteredBosses
     }, [getDBObj, searchInputText])
+
+    const removeAdsHandler = useCallback(() => {
+        Vibration.vibrate(100, false)
+    }, [])
 
     const addBossHandler = () => {
         setDBObj((prevMMKVBossesList) => {
@@ -172,7 +178,7 @@ export default function SearchBosses({ navigation }) {
                 disableRightSwipe={true}
             />
             {isFreeUser && <View style={[styles.alignCenter, { width: '100%' }]}>
-                <View style={[styles.contributeContainer, styles.alignCenter]}>
+                <Pressable onPress={removeAdsHandler} style={[styles.contributeContainer, styles.alignCenter]}>
                     <ImageBackground
                         style={{
                             // width: '100%',
@@ -191,7 +197,7 @@ export default function SearchBosses({ navigation }) {
                     >
                         <Text style={styles.contribute}>CONTRIBUTE / REMOVE ADS</Text>
                     </ImageBackground>
-                </View>
+                </Pressable>
                 <AdMobBanner
                     bannerSize='banner'
                     adUnitID='ca-app-pub-3940256099942544/6300978111'
