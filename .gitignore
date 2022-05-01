@@ -10,8 +10,11 @@ npm-debug.*
 *.mobileprovision
 *.orig.*
 web-build/
+
 design/
 playstore/
+assets/unused/
+
 
 # macOS
 .DS_Store
