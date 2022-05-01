@@ -8,6 +8,7 @@ import {
     Dimensions,
     Image,
     ImageBackground,
+    Vibration
 } from 'react-native';
 
 import { useKeepAwake } from 'expo-keep-awake';
@@ -77,6 +78,7 @@ export default function CounterScreen() {
 
 
     const _incrementCounter = useCallback(() => {
+        Vibration.vibrate(250, false)
         try {
             counterRef.current.scrollToIndex({
                 index: scrollPosition + 1
@@ -130,6 +132,7 @@ export default function CounterScreen() {
             scrollPosition = floored;
             console.log('COUNTER: Set scrollPosition (%d)', floored);
 
+            Vibration.vibrate(250, false)
             setDBObj(prevList => {
                 if (prevList != undefined && prevList.length > 0) {
                     let newList = [...prevList]
@@ -172,7 +175,7 @@ export default function CounterScreen() {
                 <View>{/* flexboxxx */}</View>
                 <ImageBackground
                     style={styles.ringImageBgComponent}
-                    source={require('../assets/elden-ring-transparent-edge.png')}
+                    source={require('../assets/elden-ring-transparent-edge2.png')}
                     resizeMode={'contain'}
                     imageStyle={styles.ringImageBgStyle}
                     blurRadius={3}

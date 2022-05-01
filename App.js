@@ -46,7 +46,7 @@ export default function App() {
                 }}>
                     <ImageBackground
                         style={styles.ringImageBgComponent}
-                        source={require('./assets/background-responsive/wallpaper-16x10-2.png')}
+                        source={require('./assets/wallpaper-16x10.png')}
                         resizeMode={'cover'}
                         imageStyle={[styles.ringImageBgStyle, {
                             // width: width,
