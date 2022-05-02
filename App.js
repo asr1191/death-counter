@@ -10,7 +10,7 @@ import { useMMKVNumber } from 'react-native-mmkv';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
 import BossContextProvider from './contexts/BossContext';
-import { IAPManagerWrapped } from './components/IAPManager';
+import IAPManagerWrapped from './components/IAPManager';
 import { BOSSES_ID_KEY } from './CONSTANTS';
 
 

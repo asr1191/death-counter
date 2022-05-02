@@ -1,7 +1,7 @@
 import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob'
 import { getPurchaseHistoryAsync, purchaseItemAsync } from 'expo-in-app-purchases'
 import { useEffect } from 'react'
-import { ImageBackground, Pressable, Text, View } from 'react-native'
+import { ImageBackground, Pressable, StyleSheet, Text, Vibration, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
 import { AD_UNIT_ID, IAP_PRODUCT_ID, USER_PRIVILEGE_DB_KEY } from '../CONSTANTS'
 import { useIap } from './IAPManager'
@@ -23,10 +23,15 @@ export default function AdComponent() {
     }, [])
 
     const checkPurchaseHistoryAndUpdate = async () => {
-        const { IAPResponseCode, results } = await getPurchaseHistoryAsync()
-        if (IAPResponseCode == 0 && results.length == 1) {
-            if (results[0].productId == IAP_PRODUCT_ID)
-                setRemoveAds(true)
+        try {
+            const { IAPResponseCode, results } = await getPurchaseHistoryAsync()
+            if (IAPResponseCode == 0 && results.length == 1) {
+                if (results[0].productId == IAP_PRODUCT_ID)
+                    setRemoveAds(true)
+            }
+        } catch (e) {
+            console.log('AD-COMPONENT: Could not retrieve purchase history!');
+            console.log(e);
         }
     }
 
@@ -36,7 +41,13 @@ export default function AdComponent() {
             if (processing)
                 return
             setProcessing(true)
-            purchaseItemAsync(IAP_PRODUCT_ID)
+            try {
+                await purchaseItemAsync(IAP_PRODUCT_ID)
+            } catch (e) {
+                setProcessing(false)
+                console.log('AD-COMPONENT: Purchase failed!');
+                console.log(e);
+            }
         }
         processPayment();
     }

@@ -37,7 +37,7 @@ export const useIap = () => React.useContext(IAPContext);
 
 
 // IAPManagerWrapped 
-export const IAPManagerWrapped = (props) => {
+export default function IAPManagerWrapped(props) {
 
     const [processing, setProcessing] = useState(false);
     const [shouldRemoveAds, setRemoveAds] = useMMKVBoolean('premium')
@@ -121,7 +121,12 @@ export const IAPManagerWrapped = (props) => {
     // when the component first renders, initiate
     // your purchase event listeners
     useEffect(() => {
-        initIAPandEventListeners();
+        try {
+
+            initIAPandEventListeners();
+        } catch (error) {
+            console.log(error);
+        }
     }, []);
 
 
@@ -138,5 +143,3 @@ export const IAPManagerWrapped = (props) => {
         </IAPContext.Provider>
     );
 }
-
-export default IAPManager;

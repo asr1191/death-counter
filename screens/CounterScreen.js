@@ -133,7 +133,7 @@ export default function CounterScreen() {
         setCanMomentum(false)
     }, [setDBObj, canMomentum])
 
-    const getItemLayoutFn = useCallback((index) => {
+    const getItemLayoutFn = useCallback((data, index) => {
         return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     }, [])
 

@@ -163,7 +163,7 @@ export default function SearchBosses({ navigation }) {
                 tension={500}
                 disableRightSwipe={true}
             />
-            {!shouldRemoveAds && <AdComponent />}
+            <AdComponent />
         </View>
     )
 }
