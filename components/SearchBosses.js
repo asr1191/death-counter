@@ -7,20 +7,17 @@ import {
     Keyboard,
     ToastAndroid,
     Image,
-    Text,
-    ImageBackground,
-    Pressable,
-    Vibration
 } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import filter from 'lodash.filter';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMMKVNumber } from 'react-native-mmkv';
-import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob';
 
 import BossRenderItem from './BossRenderItem';
 import BossHiddenRenderItem from './BossHiddenRenderItem';
 import { BossContext } from '../contexts/BossContext';
+import AdComponent from './AdComponent';
+import { BOSSES_ID_KEY } from '../CONSTANTS';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -43,12 +40,9 @@ export default function SearchBosses({ navigation }) {
     const bossesSwipeListRef = useRef(null)
     const [searchInputText, setSearchInputText] = useState('')
     const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
-    const [getNewId, setNewId] = useMMKVNumber('latest_id')
-    const [isFreeUser, setUserPrivilege] = useState(true)
+    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY)
 
-    useEffect(() => {
-        setTestDeviceIDAsync("EMULATOR");
-    }, [])
+
 
     useEffect(() => {
         console.log('BOSSES-LIST: Next ID to be inserted (%d)', getNewId);
@@ -61,10 +55,6 @@ export default function SearchBosses({ navigation }) {
         })
         return filteredBosses
     }, [getDBObj, searchInputText])
-
-    const removeAdsHandler = useCallback(() => {
-        Vibration.vibrate(100, false)
-    }, [])
 
     const addBossHandler = () => {
         setDBObj((prevMMKVBossesList) => {
@@ -173,25 +163,7 @@ export default function SearchBosses({ navigation }) {
                 tension={500}
                 disableRightSwipe={true}
             />
-            {isFreeUser && <View style={[styles.alignCenter, styles.fullWidth]}>
-                <Pressable onPress={removeAdsHandler} style={[styles.contributeContainer, styles.alignCenter]}>
-                    <ImageBackground
-                        style={[styles.fullWidth, styles.alignCenter]}
-                        imageStyle={styles.alignCenter}
-                        resizeMode={'stretch'}
-                        source={require('../assets/count-glow-2.png')}
-                    >
-                        <Text style={styles.contribute}>CONTRIBUTE / REMOVE ADS</Text>
-                    </ImageBackground>
-                </Pressable>
-                <AdMobBanner
-                    bannerSize='banner'
-                    adUnitID='ca-app-pub-3940256099942544/6300978111'
-                    servePersonalizedAds // true or false
-                    onDidFailToReceiveAdWithError={(e) => console.log(e)}
-                />
-            </View>}
-
+            {!shouldRemoveAds && <AdComponent />}
         </View>
     )
 }
@@ -220,17 +192,13 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         paddingVertical: 20,
         marginBottom: 20,
-        // marginHorizontal: 20,
         paddingHorizontal: 10,
         borderBottomColor: 'rgba(243, 211, 158, 0.2)',
         borderBottomWidth: 1,
-        // borderRadius: 20
     },
     searchBox: {
         flex: 1,
         backgroundColor: '#3B352B',
-        // marginVertical: 30,
-        // width: '100%',
         fontSize: 20,
         fontFamily: 'RomanAntique',
         color: 'rgb(243,211,158)',
@@ -246,20 +214,9 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center'
-        // height: '100%',
     },
     list: {
         width: '95%',
         marginBottom: 15
     },
-    contribute: {
-        fontFamily: 'RomanAntique',
-        color: 'rgb(243,211,158)',
-        textShadowColor: 'rgb(243,211,158)',
-        textShadowRadius: 15
-    },
-    contributeContainer: {
-        marginBottom: 15,
-        width: '100%'
-    }
 })

@@ -10,6 +10,8 @@ import { useMMKVNumber } from 'react-native-mmkv';
 
 import MainTabNavigator from './navigators/MainTabNavigator'
 import BossContextProvider from './contexts/BossContext';
+import { IAPManagerWrapped } from './components/IAPManager';
+import { BOSSES_ID_KEY } from './CONSTANTS';
 
 
 export default function App() {
@@ -20,7 +22,7 @@ export default function App() {
         OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
     });
 
-    const [getNewId, setNewId] = useMMKVNumber('latest_id')
+    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY)
 
     useEffect(() => {
         if (getNewId == undefined) {
@@ -44,9 +46,11 @@ export default function App() {
                         imageStyle={styles.ringImageBgStyle}
                         blurRadius={0}
                     >
-                        <BossContextProvider>
-                            <MainTabNavigator style={styles.tabNavigator} />
-                        </BossContextProvider>
+                        <IAPManagerWrapped>
+                            <BossContextProvider>
+                                <MainTabNavigator style={styles.tabNavigator} />
+                            </BossContextProvider>
+                        </IAPManagerWrapped>
                     </ImageBackground>
                 </View>
             </NavigationContainer>

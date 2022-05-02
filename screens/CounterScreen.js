@@ -14,22 +14,7 @@ import {
 import { useKeepAwake } from 'expo-keep-awake';
 import * as SplashScreen from 'expo-splash-screen';
 import { BossContext } from '../contexts/BossContext';
-
-const MAX_DEATH = 501
-const ITEM_HEIGHT = 200
-const ITEM_ARRAY = _initItemArray(MAX_DEATH)
-
-function _initItemArray(maxNumber) {
-    console.log('POPULATING COUNTER LIST YOOOOOOOOOOOOOOOOOOOO');
-    items = [];
-    for (let index = 0; index < maxNumber; index++) {
-        items.push({
-            id: index,
-            title: (index).toString()
-        })
-    }
-    return items;
-}
+import { ITEM_ARRAY, ITEM_HEIGHT, MAX_DEATH } from '../CONSTANTS';
 
 let scrollPosition = -1
 

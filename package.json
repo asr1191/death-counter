@@ -15,11 +15,13 @@
     "@react-navigation/stack": "^6.1.1",
     "@types/react-native": "^0.67.3",
     "expo": "^44.0.6",
+    "expo-ads-admob": "~12.0.0",
     "expo-app-loading": "~1.3.0",
     "expo-asset": "~8.4.6",
     "expo-constants": "~13.0.1",
     "expo-file-system": "~13.1.4",
     "expo-font": "~10.0.4",
+    "expo-in-app-purchases": "^12.1.1",
     "expo-keep-awake": "~10.0.1",
     "expo-linear-gradient": "~11.0.3",
     "expo-splash-screen": "~0.14.1",
@@ -46,8 +48,7 @@
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-tab-view": "^3.1.1",
     "react-native-web": "0.17.1",
-    "react-native-wheel-scrollview-picker": "^2.0.0",
-    "expo-ads-admob": "~12.0.0"
+    "react-native-wheel-scrollview-picker": "^2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
