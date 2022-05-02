@@ -106,7 +106,6 @@ export default function CounterScreen() {
         })
     }, [setDBObj, counterRef, scrollPosition])
 
-    // List Items 
     const renderItem = useCallback(({ item }) =>
     (
         <Pressable onPress={_incrementCounter}>
@@ -149,29 +148,17 @@ export default function CounterScreen() {
         setCanMomentum(false)
     }, [setDBObj, canMomentum])
 
-    const getItemLayoutFn = useCallback((data, index) => {
+    const getItemLayoutFn = useCallback((index) => {
         return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
     }, [])
 
     return (
-        <View style={{
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'space-between',
-
-        }}>
-            <View style={{
-                height: 100
-            }}>
+        <View style={styles.container}>
+            <View style={styles.topComponent}>
                 {/* flexboooooxxx */}
             </View>
 
-            <View style={{
-                alignItems: 'center',
-                width: '100%',
-                justifyContent: 'space-between',
-                // marginTop: ??
-            }}>
+            <View style={styles.deathsSuper}>
                 <View>{/* flexboxxx */}</View>
                 <ImageBackground
                     style={styles.ringImageBgComponent}
@@ -180,20 +167,10 @@ export default function CounterScreen() {
                     imageStyle={styles.ringImageBgStyle}
                     blurRadius={3}
                 >
-                    <View style={{
-                        // flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        // width: '100%'
-                    }}>
+                    <View style={styles.alignCenter}>
                         <ImageBackground
-                            style={{
-                                // width: '100%',
-                            }}
-                            imageStyle={{
-                                opacity: 0.8
-                                // height: '100%',
-                            }}
+                            style={styles.deathsGlow}
+                            imageStyle={styles.deathsGlowImg}
                             resizeMode={'center'}
                             source={require('../assets/count-glow-2.png')}
                             onLoad={SplashScreen.hideAsync}
@@ -212,57 +189,32 @@ export default function CounterScreen() {
                                 onScroll={onScrollFn}
                                 onMomentumScrollEnd={onMomentumScrollEndFn}
                                 getItemLayout={getItemLayoutFn}
-                            // scrollEventThrottle={3}
                             />
 
                         </ImageBackground>
                     </View>
 
                 </ImageBackground>
-                <View style={{
-                    // flex: 1,
-                    // justifyContent: '',
-                    alignItems: 'center',
-                    // margin: 'auto'
-                }}>
+                <View style={styles.deathsContainer}>
                     <Text style={styles.deaths}>D E A T H S</Text>
                     <Image
                         source={require('../assets/ornament-feathers.png')}
                         resizeMode={'contain'}
-                        style={{
-                            // width: 70,
-                            height: 50
-                            // bottom: 30,
-                        }}
+                        style={styles.deathsOrnaments}
                     />
                 </View>
             </View>
 
-            <View style={{
-                marginBottom: '10%',
-                width: '100%'
-            }}>
-                <View style={{
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'flex-end',
-                    height: 100,
-                }}>
-                    <Text
-                        adjustsFontSizeToFit
-                        style={styles.bossname}
-                    >
+            <View style={styles.bossNameSuper}>
+                <View style={styles.bossNameContainer}>
+                    <Text adjustsFontSizeToFit style={styles.bossname}>
                         {selectedBoss.title}
                     </Text>
                 </View>
                 <Image
                     source={require('../assets/ornament-leaves.png')}
                     resizeMode={'contain'}
-                    style={{
-                        height: 13,
-                        alignSelf: 'center',
-                        marginTop: 5
-                    }}
+                    style={styles.bottomOrnaments}
                 />
             </View>
         </View>
@@ -270,6 +222,51 @@ export default function CounterScreen() {
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+
+    },
+    topComponent: {
+        height: 100
+    },
+    deathsSuper: {
+        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'space-between',
+    },
+    alignCenter: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    deathsGlow: {
+        // width: '100%',
+    },
+    deathsGlowImg: {
+        opacity: 0.8
+    },
+    deathsContainer: {
+        alignItems: 'center',
+    },
+    deathsOrnaments: {
+        height: 50
+    },
+    bossNameSuper: {
+        marginBottom: '10%',
+        width: '100%'
+    },
+    bossNameContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'flex-end',
+        height: 100,
+    },
+    bottomOrnaments: {
+        height: 13,
+        alignSelf: 'center',
+        marginTop: 5
+    },
     flatList: {
         width: Dimensions.get('window').width,
         maxHeight: ITEM_HEIGHT
@@ -297,10 +294,8 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontFamily: 'RomanAntique',
         color: '#F3D39E',
-        // bottom: 5,
     },
     bossname: {
-        // textDecorationLine: 'line-through',
         fontSize: 28,
         textAlign: 'center',
         fontFamily: 'OptimusPrinceps',
@@ -312,16 +307,10 @@ const styles = StyleSheet.create({
 
     },
     ringImageBgComponent: {
-        // justifyContent: 'space-between',
         alignItems: 'center',
         overflow: 'visible',
-        // width: '100%'
-
-        // width: 300,
-        // height: 430
     },
     ringImageBgStyle: {
-        // bottom: 110,
         opacity: 0.2,
         transform: [{
             scale: 2

@@ -16,11 +16,11 @@ import { SwipeListView } from 'react-native-swipe-list-view';
 import filter from 'lodash.filter';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useMMKVNumber } from 'react-native-mmkv';
+import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob';
 
 import BossRenderItem from './BossRenderItem';
 import BossHiddenRenderItem from './BossHiddenRenderItem';
 import { BossContext } from '../contexts/BossContext';
-import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob';
 
 function _newLineAtComma(name) {
     let newName = name
@@ -34,6 +34,7 @@ function _newLineAtComma(name) {
     }
     return newName
 }
+
 const deathCountImage = require('../assets/floral-death-background.png')
 const footerImage = require('../assets/floral-boss-list-footer2.png')
 
@@ -125,7 +126,6 @@ export default function SearchBosses({ navigation }) {
             rowMap={rowMap}
             setDBObj={setDBObj}
             setPreviewBoss={setPreviewBoss}
-        //     hiddenRowButtonWidth={hiddenRowButtonWidth}
         />
 
     )
@@ -168,30 +168,16 @@ export default function SearchBosses({ navigation }) {
                 stopRightSwipe={-75 * 1.5}
                 previewRowKey={(getNewId - 1).toString()}
                 previewOpenValue={-40}
-                // previewRepeat={true}
-                // previewDuration={2000}
-                // previewRepeatDelay={500}
                 previewOpenDelay={250}
-                // onRowDidOpen={onRowDidOpen}
                 friction={600}
                 tension={500}
                 disableRightSwipe={true}
             />
-            {isFreeUser && <View style={[styles.alignCenter, { width: '100%' }]}>
+            {isFreeUser && <View style={[styles.alignCenter, styles.fullWidth]}>
                 <Pressable onPress={removeAdsHandler} style={[styles.contributeContainer, styles.alignCenter]}>
                     <ImageBackground
-                        style={{
-                            // width: '100%',
-                            width: '100%',
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                        }}
-                        imageStyle={{
-                            justifyContent: 'center',
-                            alignItems: 'center'
-                            // opacity: 0.8
-                            // height: '100%',
-                        }}
+                        style={[styles.fullWidth, styles.alignCenter]}
+                        imageStyle={styles.alignCenter}
                         resizeMode={'stretch'}
                         source={require('../assets/count-glow-2.png')}
                     >
@@ -211,6 +197,9 @@ export default function SearchBosses({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+    fullWidth: {
+        width: '100%',
+    },
     alignCenter: {
         alignItems: 'center',
         justifyContent: 'center',

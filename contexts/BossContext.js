@@ -1,4 +1,4 @@
-const { useEffect, useState, createContext, useRef } = require("react");
+const { useEffect, useState, createContext } = require("react");
 import { useMMKVString } from "react-native-mmkv";
 
 export const BossContext = createContext({})
@@ -13,14 +13,6 @@ export default function BossContextProvider(props) {
 
     const [_str, _setStr] = useMMKVString('bosses_list2')
     const [selectedBoss, setSelectedBoss] = useState(defaultBoss)
-
-    // useEffect(() => {
-    // if (_str == undefined || _str.length == 0) {
-    // const fetchedAllBossesData = require('../data/bosses.json').data
-    // setData(fetchedAllBossesData)
-    // setSelectedBossWrapper(fetchedAllBossesData[0])
-    // }
-    // }, [])
 
     useEffect(() => {
         if (selectedBoss.key == 'lolnoid' && _str != null) {

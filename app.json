@@ -29,21 +29,5 @@
         "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
       }
     }
-  },
-  "updates": {
-    "fallbackToCacheTimeout": 0
-  },
-  "assetBundlePatterns": [
-    "**/*"
-  ],
-  "android": {
-    "adaptiveIcon": {
-      "foregroundImage": "./assets/death-counter-adaptivelogo4.png",
-      "backgroundColor": "#FFFFFF"
-    },
-    "package": "com.amalsraj.deathtracker",
-    "config": {
-      "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
-    }
   }
 }

@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
 
 
-export default function BossRenderItem({ item, rowMap, deathCountImage, setMMKVBossesList, setPreviewBoss, itemText, navigation }) {
+export default function BossRenderItem({ item, setMMKVBossesList, setPreviewBoss, itemText, navigation }) {
 
 
     const findBossFactory = useCallback((target) => {
@@ -105,7 +105,6 @@ const styles = StyleSheet.create({
     deathCount: {
         fontSize: 40,
         color: 'rgb(243, 211, 158)',
-        // color: '#BB8D43',
         fontFamily: 'OptimusPrinceps',
     },
 })
