@@ -14,6 +14,8 @@ web-build/
 design/
 playstore/
 assets/unused/
+debug/
+data/
 
 
 # macOS

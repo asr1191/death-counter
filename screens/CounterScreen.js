@@ -196,6 +196,7 @@ export default function CounterScreen() {
                             }}
                             resizeMode={'center'}
                             source={require('../assets/count-glow-2.png')}
+                            onLoad={SplashScreen.hideAsync}
                         >
 
                             <FlatList

@@ -2,7 +2,7 @@
   "expo": {
     "name": "Death Tracker",
     "slug": "death-tracker",
-    "version": "1.0.0",
+    "version": "1.0.3",
     "orientation": "portrait",
     "splash": {
       "resizeMode": "cover",
@@ -10,15 +10,20 @@
       "image": "./assets/death-tracker-splash2.png"
     },
     "icon": "./assets/death-counter-adaptivelogo4.png",
+    "androidStatusBar": {
+      "translucent": true
+    },
     "android": {
       "package": "com.amalsraj.deathtracker",
-      "versionCode": 2,
+      "versionCode": 5,
       "softwareKeyboardLayoutMode": "pan",
       "adaptiveIcon": {
         "foregroundImage": "./assets/death-counter-adaptivelogo4.png"
       },
       "permissions": [
-        "INTERNET"
+        "INTERNET",
+        "BILLING",
+        "VIBRATE"
       ],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
