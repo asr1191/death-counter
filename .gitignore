@@ -16,7 +16,7 @@ playstore/
 assets/unused/
 debug/
 data/
-
+android-backup/
 
 # macOS
 .DS_Store

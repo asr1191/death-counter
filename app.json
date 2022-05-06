@@ -17,13 +17,14 @@
       "package": "com.amalsraj.deathtracker",
       "versionCode": 5,
       "softwareKeyboardLayoutMode": "pan",
+      "icon": "./assets/death-counter-adaptivelogo4.png",
       "adaptiveIcon": {
         "foregroundImage": "./assets/death-counter-adaptivelogo4.png"
       },
       "permissions": [
         "INTERNET",
-        "BILLING",
-        "VIBRATE"
+        "VIBRATE",
+        "com.android.vending.BILLING"
       ],
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-4755365405967473~3719396734"
