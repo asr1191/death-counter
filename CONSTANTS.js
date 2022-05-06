@@ -9,7 +9,7 @@ function _initItemArray(maxNumber) {
     }
     return items;
 }
-export const IAP_PRODUCT_ID = 'remove-ads'
+export const IAP_PRODUCT_ID = 'remove_ads'
 export const USER_PRIVILEGE_DB_KEY = 'premium'
 export const BOSSES_DB_KEY = 'bosses_list'
 export const BOSSES_ID_KEY = 'latest_id'
