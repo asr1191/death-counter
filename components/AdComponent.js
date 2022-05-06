@@ -1,5 +1,5 @@
 import { AdMobBanner, setTestDeviceIDAsync } from 'expo-ads-admob'
-import { getPurchaseHistoryAsync, purchaseItemAsync } from 'expo-in-app-purchases'
+import { purchaseItemAsync } from 'expo-in-app-purchases'
 import { useEffect } from 'react'
 import { ImageBackground, Pressable, StyleSheet, Text, Vibration, View } from 'react-native'
 import { useMMKVBoolean } from 'react-native-mmkv'
@@ -14,26 +14,6 @@ export default function AdComponent() {
     useEffect(() => {
         setTestDeviceIDAsync("EMULATOR");
     }, [])
-
-    useEffect(() => {
-        if (shouldRemoveAds)
-            return
-        checkPurchaseHistoryAndUpdate()
-
-    }, [])
-
-    const checkPurchaseHistoryAndUpdate = async () => {
-        try {
-            const { IAPResponseCode, results } = await getPurchaseHistoryAsync()
-            if (IAPResponseCode == 0 && results.length == 1) {
-                if (results[0].productId == IAP_PRODUCT_ID)
-                    setRemoveAds(true)
-            }
-        } catch (e) {
-            console.log('AD-COMPONENT: Could not retrieve purchase history!');
-            console.log(e);
-        }
-    }
 
     const removeAdsHandler = () => {
         Vibration.vibrate(100, false)
@@ -60,7 +40,7 @@ export default function AdComponent() {
                 resizeMode={'stretch'}
                 source={require('../assets/count-glow-2.png')}
             >
-                <Text style={styles.contribute}>CONTRIBUTE / REMOVE ADS</Text>
+                <Text style={styles.contribute}>REMOVE ADS / CONTRIBUTE</Text>
             </ImageBackground>
         </Pressable>
         <AdMobBanner

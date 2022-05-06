@@ -52,6 +52,7 @@ export default function IAPManagerWrapped(props) {
     // requirements, but demonstrates some common conventions
     // when processing an in-app purchase.
     const processNewPurchase = async (purchase) => {
+        console.log('IAP-MANAGER: RemoveAds flag set to true');
         setRemoveAds(true)
     }
 
@@ -62,6 +63,7 @@ export default function IAPManagerWrapped(props) {
     const getProducts = async () => {
         const { responseCode, results } = await InAppPurchases.getProductsAsync(IAP_SKUS);
         if (responseCode === InAppPurchases.IAPResponseCode.OK) {
+            console.log('IAP-MANAGER: Results %s', results);
             return results;
         } else {
             console.log('IAP-MANAGER: Failed to get products');
@@ -78,8 +80,16 @@ export default function IAPManagerWrapped(props) {
 
         // connect to store if not done so already
         try {
+            if (shouldRemoveAds)
+                return
             await InAppPurchases.connectAsync();
-        } catch (e) { /* already connected, verify error with `e` */ }
+            const products = await getProducts()
+            await checkPurchaseHistoryAndUpdate()
+        } catch (e) {
+            /* already connected, verify error with `e` */
+            console.log('IAP-MANAGER: Could not connect to IAP server');
+            console.log(e);
+        }
 
 
         // purchase listener. Most of this is boilerplate from the official docs, with a 
@@ -99,20 +109,25 @@ export default function IAPManagerWrapped(props) {
 
                         // finish the transaction on platform's end
                         InAppPurchases.finishTransactionAsync(purchase, false);
+                        console.log('IAP-MANAGER: Transaction finished.');
                     }
                 });
 
                 // handle particular error codes
             } else if (responseCode === InAppPurchases.IAPResponseCode.USER_CANCELED) {
-                console.log('User canceled the transaction');
+                console.log('IAP-MANAGER: User canceled the transaction');
             } else if (responseCode === InAppPurchases.IAPResponseCode.DEFERRED) {
-                console.log('User does not have permissions to buy but requested parental approval (iOS only)');
+                console.log('IAP-MANAGER: User does not have permissions to buy but requested parental approval (iOS only)');
+            } else if (errorCode === InAppPurchases.IAPErrorCode.ITEM_ALREADY_OWNED) {
+                console.log('IAP-MANAGER: User already paid. Setting remove flags.');
+                setRemoveAds(true);
             } else {
-                console.warn(`Something went wrong with the purchase. Received errorCode ${errorCode}`);
+                console.log(`IAP-MANAGER: Something went wrong with the purchase. Received errorCode ${errorCode}`);
             }
 
             // stop processing. This state update should be reflected
             // in your components. E.g. make IAPs accessible again.
+
             setProcessing(false);
         });
     }
@@ -122,15 +137,43 @@ export default function IAPManagerWrapped(props) {
     // your purchase event listeners
     useEffect(() => {
         try {
-
             initIAPandEventListeners();
+            console.log('IAP-MANAGER: IAP and Event Listener initialized');
         } catch (error) {
+            console.log('IAP-MANAGER: IAP and Event Listener failed to initialize');
             console.log(error);
         }
+        setRemoveAds(false)
     }, []);
 
 
-    // plug rhe values and functions into your
+
+    const checkPurchaseHistoryAndUpdate = async () => {
+        try {
+            const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync()
+            console.log('IAP-MANAGER: PurchaseHistory (Response Code: %d) \n%s', responseCode, results);
+
+            if (results.length == 0) {
+                console.log('IAP-MANAGER: No purchases found!');
+                return
+            }
+
+            if (responseCode == 0 && results.length == 1) {
+                if (results[0].productId == IAP_PRODUCT_ID) {
+                    console.log('IAP-MANAGER: User already paid for ad removal. Setting RemoveAds flag.');
+                    setRemoveAds(true)
+                }
+            } else {
+                console.log('IAP-MANAGER: Error while retrieving purchase history. Error code (%s)', responseCode);
+            }
+
+        } catch (e) {
+            console.warn('AD-COMPONENT: Could not retrieve purchase history!');
+            console.log(e);
+        }
+    }
+
+    // plug the values and functions into your
     // context that will be accessible to all
     // props.children
     return (
