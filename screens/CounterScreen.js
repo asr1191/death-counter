@@ -4,7 +4,6 @@ import {
     View,
     StyleSheet,
     FlatList,
-    Pressable,
     Dimensions,
     Image,
     ImageBackground,
@@ -76,7 +75,7 @@ export default function CounterScreen() {
             if (prev != undefined && prev != 0) {
                 let newList = [...prev]
                 if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
-                    console.log('COUNTER: Incrementing to %d', newList[0].deaths + 1);
+                    console.log('COUNTER: Incrementing to (%d)', newList[0].deaths + 1);
 
                     const newBoss = {
                         key: newList[0].key,
@@ -93,18 +92,16 @@ export default function CounterScreen() {
 
     const renderItem = useCallback(({ item }) =>
     (
-        <Pressable onPress={_incrementCounter}>
-            <View style={styles.countContainer} >
-                <Text
-                    style={styles.count}
-                    adjustsFontSizeToFit
-                    allowFontScaling={false}
-                >
-                    {item.title}
-                </Text>
-            </View>
-        </Pressable>
-    ), [_incrementCounter])
+        <View style={styles.countContainer} >
+            <Text
+                style={styles.count}
+                adjustsFontSizeToFit
+                allowFontScaling={false}
+            >
+                {item.title}
+            </Text>
+        </View>
+    ), [])
 
     const onScrollFn = useCallback(() => {
         setCanMomentum(true)
@@ -160,22 +157,25 @@ export default function CounterScreen() {
                             source={require('../assets/count-glow-2.png')}
                             onLoad={SplashScreen.hideAsync}
                         >
-
-                            <FlatList
-                                ref={counterRef}
-                                style={styles.flatList}
-                                initialScrollIndex={selectedBoss.deaths}
-                                data={ITEM_ARRAY}
-                                renderItem={renderItem}
-                                snapToInterval={ITEM_HEIGHT}
-                                showsVerticalScrollIndicator={false}
-                                fadingEdgeLength={ITEM_HEIGHT}
-                                overScrollMode={'never'}
-                                onScroll={onScrollFn}
-                                onMomentumScrollEnd={onMomentumScrollEndFn}
-                                getItemLayout={getItemLayoutFn}
-                            />
-
+                            <View
+                                onStartShouldSetResponder={() => true}
+                                onResponderRelease={_incrementCounter}
+                            >
+                                <FlatList
+                                    ref={counterRef}
+                                    style={styles.flatList}
+                                    initialScrollIndex={selectedBoss.deaths}
+                                    data={ITEM_ARRAY}
+                                    renderItem={renderItem}
+                                    snapToInterval={ITEM_HEIGHT}
+                                    showsVerticalScrollIndicator={false}
+                                    fadingEdgeLength={ITEM_HEIGHT}
+                                    overScrollMode={'never'}
+                                    onScroll={onScrollFn}
+                                    onMomentumScrollEnd={onMomentumScrollEndFn}
+                                    getItemLayout={getItemLayoutFn}
+                                />
+                            </View>
                         </ImageBackground>
                     </View>
 
