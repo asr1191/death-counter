@@ -11,9 +11,9 @@ export default function AdComponent() {
     const [shouldRemoveAds, setRemoveAds] = useMMKVBoolean(USER_PRIVILEGE_DB_KEY)
     const { processing, setProcessing } = useIap()
 
-    useEffect(() => {
-        setTestDeviceIDAsync("EMULATOR");
-    }, [])
+    // useEffect(() => {
+    //     setTestDeviceIDAsync("EMULATOR");
+    // }, [])
 
     const removeAdsHandler = () => {
         Vibration.vibrate(100, false)
