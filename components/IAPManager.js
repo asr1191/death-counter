@@ -42,6 +42,48 @@ export default function IAPManagerWrapped(props) {
     const [processing, setProcessing] = useState(false);
     const [shouldRemoveAds, setRemoveAds] = useMMKVBoolean('premium')
 
+    // when the component first renders, initiate
+    // your purchase event listeners
+    useEffect(() => {
+        try {
+            initIAPandEventListeners();
+            console.log('IAP-MANAGER: IAP and Purchase Listener initialized');
+        } catch (error) {
+            console.log('IAP-MANAGER: IAP and Purchase Listener failed to initialize');
+            console.log(error);
+        }
+    }, []);
+
+    const checkPurchaseHistoryAndUpdateAsync = async () => {
+        try {
+            const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync()
+            console.log('IAP-MANAGER: PurchaseHistory (Response Code: %d) \n%s', responseCode, results);
+
+            if (results.length == 0) {
+                console.log('IAP-MANAGER: No purchases found!');
+                if (responseCode == 0) {
+                    console.log('IAP-MANAGER: No purchases found, so setting RemoveFlags as false');
+                    setRemoveAds(false)
+                }
+                return
+            }
+
+            if (responseCode == 0 && results.length == 1) {
+                if (results[0].productId == IAP_PRODUCT_ID) {
+                    console.log('IAP-MANAGER: User already paid for ad removal. Setting RemoveAds flag.');
+                    setRemoveAds(true)
+                }
+            } else {
+                console.log('IAP-MANAGER: Error while retrieving purchase history. Error code (%s)', responseCode);
+            }
+
+        } catch (e) {
+            console.warn('AD-COMPONENT: Could not retrieve purchase history!');
+            console.log(e);
+        }
+    }
+
+
 
     // app logic to process a subscription
     // this is not a part of expo-in-app-purchases, but handles
@@ -84,7 +126,7 @@ export default function IAPManagerWrapped(props) {
                 return
             await InAppPurchases.connectAsync();
             const products = await getProducts()
-            await checkPurchaseHistoryAndUpdate()
+            await checkPurchaseHistoryAndUpdateAsync()
         } catch (e) {
             /* already connected, verify error with `e` */
             console.log('IAP-MANAGER: Could not connect to IAP server');
@@ -96,18 +138,23 @@ export default function IAPManagerWrapped(props) {
         // couple of additions to process a purchase and stop processing.
         InAppPurchases.setPurchaseListener(({ responseCode, results, errorCode }) => {
 
+            console.log('IAP-MANAGER: Inside purchase listener');
             // Purchase was successful
             if (responseCode === InAppPurchases.IAPResponseCode.OK) {
+
                 results.forEach(async (purchase) => {
+                    console.log('IAP-MANAGAER: Purchase Object\n%s', purchase)
                     if (!purchase.acknowledged) {
 
                         // process transaction here and unlock content
                         // !! This is your own logic that is not a part of expo-in-app-purchases.
                         // any processing that needs to be done within your app or on your server
                         // can be executed here, just before finishTransactionAsync
+                        console.log('IAP-MANAGER: Processing purchase...');
                         await processNewPurchase(purchase);
 
                         // finish the transaction on platform's end
+                        console.log('IAP-MANAGER: Acknowledging transaction...');
                         InAppPurchases.finishTransactionAsync(purchase, false);
                         console.log('IAP-MANAGER: Transaction finished.');
                     }
@@ -127,51 +174,14 @@ export default function IAPManagerWrapped(props) {
 
             // stop processing. This state update should be reflected
             // in your components. E.g. make IAPs accessible again.
-
-            setProcessing(false);
+            console.log('IAP-MANAGER: Purchase logic complete.');
+            // checkPurchaseHistoryAndUpdate()
+            setProcessing(false)
         });
     }
 
 
-    // when the component first renders, initiate
-    // your purchase event listeners
-    useEffect(() => {
-        try {
-            initIAPandEventListeners();
-            console.log('IAP-MANAGER: IAP and Event Listener initialized');
-        } catch (error) {
-            console.log('IAP-MANAGER: IAP and Event Listener failed to initialize');
-            console.log(error);
-        }
-        setRemoveAds(false)
-    }, []);
 
-
-
-    const checkPurchaseHistoryAndUpdate = async () => {
-        try {
-            const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync()
-            console.log('IAP-MANAGER: PurchaseHistory (Response Code: %d) \n%s', responseCode, results);
-
-            if (results.length == 0) {
-                console.log('IAP-MANAGER: No purchases found!');
-                return
-            }
-
-            if (responseCode == 0 && results.length == 1) {
-                if (results[0].productId == IAP_PRODUCT_ID) {
-                    console.log('IAP-MANAGER: User already paid for ad removal. Setting RemoveAds flag.');
-                    setRemoveAds(true)
-                }
-            } else {
-                console.log('IAP-MANAGER: Error while retrieving purchase history. Error code (%s)', responseCode);
-            }
-
-        } catch (e) {
-            console.warn('AD-COMPONENT: Could not retrieve purchase history!');
-            console.log(e);
-        }
-    }
 
     // plug the values and functions into your
     // context that will be accessible to all

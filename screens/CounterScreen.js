@@ -183,7 +183,7 @@ export default function CounterScreen() {
                 </ImageBackground>
                 <Pressable onPress={_incrementCounter}>
                     <View style={styles.deathsContainer}>
-                        <Text style={styles.deaths}>{selectedBoss.key == 'lolnoid' ? 'TAP / SWIPE TO DIE' : 'D E A T H S'}</Text>
+                        <Text style={styles.deaths}>{selectedBoss.key == 'lolnoid' ? 'TAP / SWIPE TO INCREASE' : 'D E A T H S'}</Text>
                         <Image
                             source={require('../assets/ornament-feathers.png')}
                             resizeMode={'contain'}
