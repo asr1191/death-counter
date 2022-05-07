@@ -7,7 +7,8 @@ import {
     Dimensions,
     Image,
     ImageBackground,
-    Vibration
+    Vibration,
+    Pressable
 } from 'react-native';
 
 import { useKeepAwake } from 'expo-keep-awake';
@@ -180,14 +181,16 @@ export default function CounterScreen() {
                     </View>
 
                 </ImageBackground>
-                <View style={styles.deathsContainer}>
-                    <Text style={styles.deaths}>D E A T H S</Text>
-                    <Image
-                        source={require('../assets/ornament-feathers.png')}
-                        resizeMode={'contain'}
-                        style={styles.deathsOrnaments}
-                    />
-                </View>
+                <Pressable onPress={_incrementCounter}>
+                    <View style={styles.deathsContainer}>
+                        <Text style={styles.deaths}>{selectedBoss.key == 'lolnoid' ? 'TAP / SWIPE TO DIE' : 'D E A T H S'}</Text>
+                        <Image
+                            source={require('../assets/ornament-feathers.png')}
+                            resizeMode={'contain'}
+                            style={styles.deathsOrnaments}
+                        />
+                    </View>
+                </Pressable>
             </View>
 
             <View style={styles.bossNameSuper}>
