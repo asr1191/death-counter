@@ -13,6 +13,11 @@
     "androidStatusBar": {
       "translucent": true
     },
+    "androidNavigationBar": {
+      "visible": "sticky-immersive",
+      "barStyle": "dark-content",
+      "backgroundColor": "#161412"
+    },
     "android": {
       "package": "com.amalsraj.deathtracker",
       "versionCode": 10,
