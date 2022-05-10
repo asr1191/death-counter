@@ -7,6 +7,7 @@ import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useMMKVNumber } from 'react-native-mmkv';
+import * as NavigationBar from 'expo-navigation-bar'
 
 import MainTabNavigator from './navigators/MainTabNavigator'
 import BossContextProvider from './contexts/BossContext';
@@ -23,6 +24,11 @@ export default function App() {
     });
 
     const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY)
+
+    useEffect(() => {
+        NavigationBar.setVisibilityAsync('hidden')
+        NavigationBar.setBehaviorAsync('overlay-swipe')
+    }, [])
 
     useEffect(() => {
         if (getNewId == undefined) {
