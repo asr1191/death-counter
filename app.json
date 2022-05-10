@@ -2,7 +2,7 @@
   "expo": {
     "name": "Death Tracker",
     "slug": "death-tracker",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "orientation": "portrait",
     "splash": {
       "resizeMode": "cover",
@@ -20,7 +20,7 @@
     },
     "android": {
       "package": "com.amalsraj.deathtracker",
-      "versionCode": 10,
+      "versionCode": 11,
       "softwareKeyboardLayoutMode": "pan",
       "icon": "./assets/death-counter-adaptivelogo4.png",
       "adaptiveIcon": {
