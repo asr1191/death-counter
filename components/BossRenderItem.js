@@ -1,32 +1,38 @@
-import { useCallback } from 'react'
-import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native'
+/* eslint-disable import/namespace */
+import { useCallback } from 'react';
+import { StyleSheet, TouchableNativeFeedback, View, Text } from 'react-native';
 
-
-export default function BossRenderItem({ item, setMMKVBossesList, setPreviewBoss, itemText, navigation }) {
-
-
+export default function BossRenderItem({
+    item,
+    setMMKVBossesList,
+    setPreviewBoss,
+    itemText,
+    navigation,
+}) {
     const findBossFactory = useCallback((target) => {
         const findFunction = (element) => {
-            return element.key == target.key
-        }
-        return findFunction
-    })
+            return element.key === target.key;
+        };
+        return findFunction;
+    });
 
     const onTouchHandlerItem = useCallback(() => {
-        navigation.navigate('D E A T H S')
-        setPreviewBoss(item)
+        navigation.navigate('D E A T H S');
+        setPreviewBoss(item);
         setMMKVBossesList((prevList) => {
-            if (item != prevList[0]) {
-                let newBossesList = [...prevList]
-                newBossesList.unshift(newBossesList.splice(newBossesList.findIndex(findBossFactory(item)), 1)[0])
+            if (item !== prevList[0]) {
+                const newBossesList = [...prevList];
+                newBossesList.unshift(
+                    newBossesList.splice(newBossesList.findIndex(findBossFactory(item)), 1)[0]
+                );
                 console.log('BOSSESLIST: Shifted boss to top %s', newBossesList[0]);
                 return newBossesList;
             }
-        })
-    }, [setMMKVBossesList])
+        });
+    }, [setMMKVBossesList]);
 
     return (
-        <TouchableNativeFeedback onPress={onTouchHandlerItem} >
+        <TouchableNativeFeedback onPress={onTouchHandlerItem}>
             <View style={styles.item}>
                 <View style={styles.itemTextContainer}>
                     <View style={styles.itemTextSubContainer}>
@@ -47,9 +53,8 @@ export default function BossRenderItem({ item, setMMKVBossesList, setPreviewBoss
                 </View>
             </View>
         </TouchableNativeFeedback>
-    )
+    );
 }
-
 
 const styles = StyleSheet.create({
     item: {
@@ -58,7 +63,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'center',
         backgroundColor: 'rgba(47, 42, 35, 1)',
-        backgroundColor: 'rgb(59, 53, 43)',
+        // backgroundColor: 'rgb(59, 53, 43)',
 
         borderRadius: 15,
         marginBottom: 10,
@@ -66,13 +71,12 @@ const styles = StyleSheet.create({
     itemTextContainer: {
         justifyContent: 'center',
         flex: 3,
-        marginLeft: 20
-
+        marginLeft: 20,
     },
     itemTextSubContainer: {
         flex: 1,
         justifyContent: 'center',
-        marginVertical: 20
+        marginVertical: 20,
     },
     itemText: {
         fontSize: 20,
@@ -93,9 +97,11 @@ const styles = StyleSheet.create({
     },
     deathCountImage: {
         opacity: 0.1,
-        transform: [{
-            scale: 1.5
-        }]
+        transform: [
+            {
+                scale: 1.5,
+            },
+        ],
     },
     deathCountTextContainer: {
         flex: 1,
@@ -107,4 +113,4 @@ const styles = StyleSheet.create({
         color: 'rgb(243, 211, 158)',
         fontFamily: 'OptimusPrinceps',
     },
-})
+});

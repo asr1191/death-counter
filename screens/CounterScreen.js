@@ -1,4 +1,7 @@
-import React, { useEffect, useState, useRef, useContext, useCallback } from 'react'
+/* eslint-disable import/namespace */
+import { useKeepAwake } from 'expo-keep-awake';
+import * as SplashScreen from 'expo-splash-screen';
+import React, { useEffect, useState, useRef, useContext, useCallback } from 'react';
 import {
     Text,
     View,
@@ -8,160 +11,161 @@ import {
     Image,
     ImageBackground,
     Vibration,
-    Pressable
+    Pressable,
 } from 'react-native';
 
-import { useKeepAwake } from 'expo-keep-awake';
-import * as SplashScreen from 'expo-splash-screen';
-import { BossContext } from '../contexts/BossContext';
 import { ITEM_ARRAY, ITEM_HEIGHT, MAX_DEATH } from '../CONSTANTS';
+import { BossContext } from '../contexts/BossContext';
 
-let scrollPosition = -1
+let scrollPosition = -1;
 
 export default function CounterScreen() {
     const [canMomentum, setCanMomentum] = useState(false);
-    const { selectedBoss, setDBObj } = useContext(BossContext)
-    const counterRef = useRef(null)
+    const { selectedBoss, setDBObj } = useContext(BossContext);
+    const counterRef = useRef(null);
 
     useKeepAwake();
 
     useEffect(() => {
         try {
             counterRef.current.scrollToIndex({
-                index: selectedBoss.deaths
-            })
-
+                index: selectedBoss.deaths,
+            });
+            // eslint-disable-next-line no-unused-vars
         } catch (e) {
             console.warn('COUNTERREF ERRORO LMAO');
         }
-        SplashScreen.hideAsync()
-    },
-        []
-    )
+        SplashScreen.hideAsync();
+    }, []);
 
     useEffect(() => {
         console.log('<========NEW RENDER (COUNTER SCREEN)========>');
-    })
+    });
 
     useEffect(() => {
         console.log('PREVIEW BOSS: %s', selectedBoss);
-        console.log('COUNTER: scrollPosition (%d), count (%d)', scrollPosition, selectedBoss.deaths);
-        if (scrollPosition != selectedBoss.deaths && counterRef.current != null) {
-            console.log('COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d', scrollPosition, selectedBoss.deaths, selectedBoss.deaths);
+        console.log(
+            'COUNTER: scrollPosition (%d), count (%d)',
+            scrollPosition,
+            selectedBoss.deaths
+        );
+        if ((scrollPosition = selectedBoss.deaths && counterRef.current !== null)) {
+            console.log(
+                'COUNTER: scrollPosition different from parent state! (%d, %d). Scrolling to %d',
+                scrollPosition,
+                selectedBoss.deaths,
+                selectedBoss.deaths
+            );
             try {
                 counterRef.current.scrollToIndex({
                     index: selectedBoss.deaths,
-                })
+                });
+                // eslint-disable-next-line no-unused-vars
             } catch (e) {
                 console.warn('COUNTERREF ERRORO LMAO');
             }
-            scrollPosition = selectedBoss.deaths
+            scrollPosition = selectedBoss.deaths;
             console.log('NAVIGATOR: Navigating to DeathsScreen');
         }
-
-    }, [selectedBoss, counterRef])
-
+    }, [selectedBoss, counterRef]);
 
     const _incrementCounter = useCallback(() => {
-        Vibration.vibrate(100, false)
+        Vibration.vibrate(100, false);
         try {
             counterRef.current.scrollToIndex({
-                index: scrollPosition + 1
-            })
+                index: scrollPosition + 1,
+            });
+            // eslint-disable-next-line no-unused-vars
         } catch (e) {
             console.warn('COUNTERREF ERRORO LMAO');
         }
-        scrollPosition += 1
+        scrollPosition += 1;
         setDBObj((prev) => {
-            if (prev != undefined && prev != 0) {
-                let newList = [...prev]
+            if (prev !== undefined && prev !== 0) {
+                const newList = [...prev];
                 if (newList[0].deaths + 1 < MAX_DEATH && counterRef.current != null) {
                     console.log('COUNTER: Incrementing to (%d)', newList[0].deaths + 1);
 
                     const newBoss = {
                         key: newList[0].key,
                         title: newList[0].title,
-                        deaths: newList[0].deaths + 1
-                    }
+                        deaths: newList[0].deaths + 1,
+                    };
 
-                    newList.splice(0, 1, newBoss)
-                    return newList
+                    newList.splice(0, 1, newBoss);
+                    return newList;
                 }
             }
-        })
-    }, [setDBObj, counterRef, scrollPosition])
+        });
+    }, [setDBObj, counterRef, scrollPosition]);
 
-    const renderItem = useCallback(({ item }) =>
-    (
-        <View style={styles.countContainer} >
-            <Text
-                style={styles.count}
-                adjustsFontSizeToFit
-                allowFontScaling={false}
-            >
-                {item.title}
-            </Text>
-        </View>
-    ), [])
+    const renderItem = useCallback(
+        ({ item }) => (
+            <View style={styles.countContainer}>
+                <Text style={styles.count} adjustsFontSizeToFit allowFontScaling={false}>
+                    {item.title}
+                </Text>
+            </View>
+        ),
+        []
+    );
 
     const onScrollFn = useCallback(() => {
-        setCanMomentum(true)
-    }, [])
+        setCanMomentum(true);
+    }, []);
 
-    const onMomentumScrollEndFn = useCallback((event) => {
-        if (canMomentum) {
-            let floored = Math.floor((event.nativeEvent.contentOffset.y + 100) / ITEM_HEIGHT)
-            scrollPosition = floored;
-            console.log('COUNTER: Set scrollPosition (%d)', floored);
+    const onMomentumScrollEndFn = useCallback(
+        (event) => {
+            if (canMomentum) {
+                const floored = Math.floor((event.nativeEvent.contentOffset.y + 100) / ITEM_HEIGHT);
+                scrollPosition = floored;
+                console.log('COUNTER: Set scrollPosition (%d)', floored);
 
-            Vibration.vibrate(100, false)
-            setDBObj(prevList => {
-                if (prevList != undefined && prevList.length > 0) {
-                    let newList = [...prevList]
-                    const newBoss = {
-                        key: newList[0].key,
-                        title: newList[0].title,
-                        deaths: floored
+                Vibration.vibrate(100, false);
+                setDBObj((prevList) => {
+                    if (prevList !== undefined && prevList.length > 0) {
+                        const newList = [...prevList];
+                        const newBoss = {
+                            key: newList[0].key,
+                            title: newList[0].title,
+                            deaths: floored,
+                        };
+                        newList.splice(0, 1, newBoss);
+                        return newList;
                     }
-                    newList.splice(0, 1, newBoss)
-                    return newList
-                }
-            })
-        }
-        setCanMomentum(false)
-    }, [setDBObj, canMomentum])
+                });
+            }
+            setCanMomentum(false);
+        },
+        [setDBObj, canMomentum]
+    );
 
     const getItemLayoutFn = useCallback((data, index) => {
-        return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index }
-    }, [])
+        return { length: ITEM_HEIGHT, offset: ITEM_HEIGHT * index, index };
+    }, []);
 
     return (
         <View style={styles.container}>
-            <View style={styles.topComponent}>
-                {/* flexboooooxxx */}
-            </View>
+            <View style={styles.topComponent}>{/* flexboooooxxx */}</View>
 
             <View style={styles.deathsSuper}>
                 <View>{/* flexboxxx */}</View>
                 <ImageBackground
                     style={styles.ringImageBgComponent}
                     source={require('../assets/elden-ring-transparent-edge2.png')}
-                    resizeMode={'contain'}
+                    resizeMode="contain"
                     imageStyle={styles.ringImageBgStyle}
-                    blurRadius={3}
-                >
+                    blurRadius={3}>
                     <View style={styles.alignCenter}>
                         <ImageBackground
                             style={styles.deathsGlow}
                             imageStyle={styles.deathsGlowImg}
-                            resizeMode={'center'}
+                            resizeMode="center"
                             source={require('../assets/count-glow-2.png')}
-                            onLoad={SplashScreen.hideAsync}
-                        >
+                            onLoad={SplashScreen.hideAsync}>
                             <View
                                 onStartShouldSetResponder={() => true}
-                                onResponderRelease={_incrementCounter}
-                            >
+                                onResponderRelease={_incrementCounter}>
                                 <FlatList
                                     ref={counterRef}
                                     style={styles.flatList}
@@ -171,7 +175,7 @@ export default function CounterScreen() {
                                     snapToInterval={ITEM_HEIGHT}
                                     showsVerticalScrollIndicator={false}
                                     fadingEdgeLength={ITEM_HEIGHT}
-                                    overScrollMode={'never'}
+                                    overScrollMode="never"
                                     onScroll={onScrollFn}
                                     onMomentumScrollEnd={onMomentumScrollEndFn}
                                     getItemLayout={getItemLayoutFn}
@@ -179,14 +183,17 @@ export default function CounterScreen() {
                             </View>
                         </ImageBackground>
                     </View>
-
                 </ImageBackground>
                 <Pressable onPress={_incrementCounter}>
                     <View style={styles.deathsContainer}>
-                        <Text style={styles.deaths}>{selectedBoss.key == 'lolnoid' ? 'TAP / SWIPE TO INCREASE' : 'D E A T H S'}</Text>
+                        <Text style={styles.deaths}>
+                            {selectedBoss.key === 'lolnoid'
+                                ? 'TAP / SWIPE TO INCREASE'
+                                : 'D E A T H S'}
+                        </Text>
                         <Image
                             source={require('../assets/ornament-feathers.png')}
-                            resizeMode={'contain'}
+                            resizeMode="contain"
                             style={styles.deathsOrnaments}
                         />
                     </View>
@@ -201,7 +208,7 @@ export default function CounterScreen() {
                 </View>
                 <Image
                     source={require('../assets/ornament-leaves.png')}
-                    resizeMode={'contain'}
+                    resizeMode="contain"
                     style={styles.bottomOrnaments}
                 />
             </View>
@@ -214,10 +221,9 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'space-between',
-
     },
     topComponent: {
-        height: 100
+        height: 100,
     },
     deathsSuper: {
         alignItems: 'center',
@@ -232,17 +238,17 @@ const styles = StyleSheet.create({
         // width: '100%',
     },
     deathsGlowImg: {
-        opacity: 0.8
+        opacity: 0.8,
     },
     deathsContainer: {
         alignItems: 'center',
     },
     deathsOrnaments: {
-        height: 50
+        height: 50,
     },
     bossNameSuper: {
         marginBottom: '10%',
-        width: '100%'
+        width: '100%',
     },
     bossNameContainer: {
         flexDirection: 'row',
@@ -253,18 +259,18 @@ const styles = StyleSheet.create({
     bottomOrnaments: {
         height: 13,
         alignSelf: 'center',
-        marginTop: 5
+        marginTop: 5,
     },
     flatList: {
         width: Dimensions.get('window').width,
-        maxHeight: ITEM_HEIGHT
+        maxHeight: ITEM_HEIGHT,
     },
     countContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        height: ITEM_HEIGHT
+        height: ITEM_HEIGHT,
     },
     count: {
         fontSize: 180,
@@ -274,8 +280,7 @@ const styles = StyleSheet.create({
         width: '100%',
         textShadowColor: '#BB8D43',
         textShadowRadius: 30,
-        height: ITEM_HEIGHT
-
+        height: ITEM_HEIGHT,
     },
     deaths: {
         fontSize: 20,
@@ -292,7 +297,6 @@ const styles = StyleSheet.create({
         textShadowRadius: 15,
         flexWrap: 'wrap',
         flex: 0.8,
-
     },
     ringImageBgComponent: {
         alignItems: 'center',
@@ -300,8 +304,10 @@ const styles = StyleSheet.create({
     },
     ringImageBgStyle: {
         opacity: 0.2,
-        transform: [{
-            scale: 2
-        }]
-    }
-})
+        transform: [
+            {
+                scale: 2,
+            },
+        ],
+    },
+});

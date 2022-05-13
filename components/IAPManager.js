@@ -1,3 +1,4 @@
+/* eslint-disable import/namespace */
 /* This is boilerplate code for a sample in-app purchase implementation for 
 React Native, using `expo-in-app-purchases`.
 
@@ -9,18 +10,16 @@ the store in question (App Store or Google Play). It provides a context to
 child components allowing any child component to request a purchase.
 */
 
-import React, { useState, useEffect } from 'react'
-import * as InAppPurchases from 'expo-in-app-purchases'
-import { useMMKVBoolean } from 'react-native-mmkv'
-import { IAP_PRODUCT_ID } from '../CONSTANTS';
+import * as InAppPurchases from 'expo-in-app-purchases';
+import React, { useState, useEffect } from 'react';
 import { ToastAndroid } from 'react-native';
+import { useMMKVBoolean } from 'react-native-mmkv';
 
+import { IAP_PRODUCT_ID } from '../CONSTANTS';
 
-// define your in-app purchase SKUs 
+// define your in-app purchase SKUs
 // for both App Store and Google Play.
-const IAP_SKUS = [
-    IAP_PRODUCT_ID,
-]
+const IAP_SKUS = [IAP_PRODUCT_ID];
 
 // define a context to host your IAP functionality
 // processing: boolean. Reflects whether a purchase is currently in progress
@@ -28,20 +27,18 @@ const IAP_SKUS = [
 // getProducts: a wrapper function that calls expo-in-app-purchase method getProductsAsync()
 export const IAPContext = React.createContext({
     processing: false,
-    setProcessing: () => { },
-    getProducts: () => { },
+    setProcessing: () => {},
+    getProducts: () => {},
 });
-
 
 // define a useContext hook for functional components
 export const useIap = () => React.useContext(IAPContext);
 
-
-// IAPManagerWrapped 
+// IAPManagerWrapped
 export default function IAPManagerWrapped(props) {
-
     const [processing, setProcessing] = useState(false);
-    const [shouldRemoveAds, setRemoveAds] = useMMKVBoolean('premium')
+    // eslint-disable-next-line no-unused-vars
+    const [shouldRemoveAds, setRemoveAds] = useMMKVBoolean('premium');
 
     // when the component first renders, initiate
     // your purchase event listeners
@@ -60,36 +57,33 @@ export default function IAPManagerWrapped(props) {
     // and defined an event listener for processing purchase
     // requests, both for one-time purchases and subscriptions
     const initIAPandEventListeners = async () => {
-
         // connect to store if not done so already
         try {
             await InAppPurchases.connectAsync();
-            const products = await getProducts()
-            await checkPurchaseHistoryAndUpdateAsync()
+            await getProducts();
+            await checkPurchaseHistoryAndUpdateAsync();
         } catch (e) {
             /* already connected, verify error with `e` */
             console.log('IAP-MANAGER: Could not connect to IAP server');
             console.log(e);
         }
 
-
-        // purchase listener. Most of this is boilerplate from the official docs, with a 
+        // purchase listener. Most of this is boilerplate from the official docs, with a
         // couple of additions to process a purchase and stop processing.
         InAppPurchases.setPurchaseListener(({ responseCode, results, errorCode }) => {
-
             console.log('IAP-MANAGER: Inside purchase listener');
             // Purchase was successful
             if (responseCode === InAppPurchases.IAPResponseCode.OK) {
-
                 results.forEach(async (purchase) => {
-                    console.log('IAP-MANAGAER: Purchase Object\n%s', purchase)
+                    console.log('IAP-MANAGAER: Purchase Object\n%s', purchase);
                     if (!purchase.acknowledged) {
-
                         // process transaction here and unlock content
                         // !! This is your own logic that is not a part of expo-in-app-purchases.
                         // any processing that needs to be done within your app or on your server
                         // can be executed here, just before finishTransactionAsync
-                        if (purchase.purchaseState == InAppPurchases.InAppPurchaseState.PURCHASED) {
+                        if (
+                            purchase.purchaseState === InAppPurchases.InAppPurchaseState.PURCHASED
+                        ) {
                             console.log('IAP-MANAGER: Processing purchase...');
                             await processNewPurchase(purchase);
 
@@ -97,9 +91,14 @@ export default function IAPManagerWrapped(props) {
                             console.log('IAP-MANAGER: Acknowledging transaction...');
                             InAppPurchases.finishTransactionAsync(purchase, false);
                             console.log('IAP-MANAGER: Transaction finished.');
-                        } else if (purchase.purchaseState == InAppPurchases.InAppPurchaseState.PURCHASING) {
+                        } else if (
+                            purchase.purchaseState === InAppPurchases.InAppPurchaseState.PURCHASING
+                        ) {
                             console.log('IAP-MANAGER: Purchase still processing on store side');
-                            ToastAndroid.show('Purchase is taking too long.. Try restarting app in a few minutes..', 6000)
+                            ToastAndroid.show(
+                                'Purchase is taking too long.. Try restarting app in a few minutes..',
+                                6000
+                            );
                         }
                     }
                 });
@@ -108,59 +107,72 @@ export default function IAPManagerWrapped(props) {
             } else if (responseCode === InAppPurchases.IAPResponseCode.USER_CANCELED) {
                 console.log('IAP-MANAGER: User canceled the transaction');
             } else if (responseCode === InAppPurchases.IAPResponseCode.DEFERRED) {
-                console.log('IAP-MANAGER: User does not have permissions to buy but requested parental approval (iOS only)');
+                console.log(
+                    'IAP-MANAGER: User does not have permissions to buy but requested parental approval (iOS only)'
+                );
             } else if (errorCode === InAppPurchases.IAPErrorCode.ITEM_ALREADY_OWNED) {
                 console.log('IAP-MANAGER: User already paid. Setting remove flags.');
                 setRemoveAds(true);
             } else {
-                console.log(`IAP-MANAGER: Something went wrong with the purchase. Received errorCode ${errorCode}`);
+                console.log(
+                    `IAP-MANAGER: Something went wrong with the purchase. Received errorCode ${errorCode}`
+                );
             }
 
             // stop processing. This state update should be reflected
             // in your components. E.g. make IAPs accessible again.
             console.log('IAP-MANAGER: Purchase logic complete.');
             // checkPurchaseHistoryAndUpdate()
-            setProcessing(false)
+            setProcessing(false);
         });
-    }
+    };
 
     const checkPurchaseHistoryAndUpdateAsync = async () => {
         try {
-            const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync()
-            console.log('IAP-MANAGER: PurchaseHistory (Response Code: %d) \n%s', responseCode, results);
+            const { responseCode, results } = await InAppPurchases.getPurchaseHistoryAsync();
+            console.log(
+                'IAP-MANAGER: PurchaseHistory (Response Code: %d) \n%s',
+                responseCode,
+                results
+            );
 
-            if (responseCode == 0) {
-
-                if (results.length == 0) {
+            if (responseCode === 0) {
+                if (results.length === 0) {
                     console.log('IAP-MANAGER: No purchases found, so setting RemoveFlags as false');
-                    setRemoveAds(false)
+                    setRemoveAds(false);
                 }
 
-                if (results.length == 1) {
+                if (results.length === 1) {
                     results.forEach((result) => {
-                        if (result.productId == IAP_PRODUCT_ID) {
-                            if (result.purchaseState == InAppPurchases.InAppPurchaseState.PURCHASED) {
-                                console.log('IAP-MANAGER: User already paid for ad removal. Setting RemoveAds flag.');
-                                setRemoveAds(true)
+                        if (result.productId === IAP_PRODUCT_ID) {
+                            if (
+                                result.purchaseState === InAppPurchases.InAppPurchaseState.PURCHASED
+                            ) {
+                                console.log(
+                                    'IAP-MANAGER: User already paid for ad removal. Setting RemoveAds flag.'
+                                );
+                                setRemoveAds(true);
                             } else {
                                 console.log('IAP-MANAGER: User purchase have not finished ');
                             }
                         }
-                    })
+                    });
                 } else {
-                    console.log('IAP-MANAGER: Error while retrieving purchase history. Error code (%s)', responseCode);
+                    console.log(
+                        'IAP-MANAGER: Error while retrieving purchase history. Error code (%s)',
+                        responseCode
+                    );
                 }
             }
-
         } catch (e) {
             console.warn('AD-COMPONENT: Could not retrieve purchase history!');
             console.log(e);
         }
-    }
+    };
 
     // getProducts
     // calls getProductsAsync and returns the results.
-    // returns an empty array if call fails. 
+    // returns an empty array if call fails.
     const getProducts = async () => {
         const { responseCode, results } = await InAppPurchases.getProductsAsync(IAP_SKUS);
         if (responseCode === InAppPurchases.IAPResponseCode.OK) {
@@ -170,11 +182,11 @@ export default function IAPManagerWrapped(props) {
             console.log('IAP-MANAGER: Failed to get products');
             return [];
         }
-    }
+    };
 
     // app logic to process a subscription
     // this is not a part of expo-in-app-purchases, but handles
-    // your own app / server-side logic for processing a new 
+    // your own app / server-side logic for processing a new
     // purchase or subscription.
 
     // this entire function can be amended to meet your own
@@ -182,19 +194,19 @@ export default function IAPManagerWrapped(props) {
     // when processing an in-app purchase.
     const processNewPurchase = async (purchase) => {
         console.log('IAP-MANAGER: Purchase processed storeside. RemoveAds flag set to true');
-        setRemoveAds(true)
-
-    }
+        setRemoveAds(true);
+    };
 
     // plug the values and functions into your
     // context that will be accessible to all
     // props.children
     return (
-        <IAPContext.Provider value={{
-            processing: processing,
-            setProcessing: setProcessing,
-            getProducts: getProducts,
-        }}>
+        <IAPContext.Provider
+            value={{
+                processing,
+                setProcessing,
+                getProducts,
+            }}>
             {props.children}
         </IAPContext.Provider>
     );

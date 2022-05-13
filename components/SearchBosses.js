@@ -1,4 +1,7 @@
-import React, { useCallback, useEffect, useState, useRef, useContext } from 'react'
+/* eslint-disable import/namespace */
+import { MaterialIcons } from '@expo/vector-icons';
+import filter from 'lodash.filter';
+import React, { useCallback, useEffect, useState, useRef, useContext } from 'react';
 import {
     StyleSheet,
     View,
@@ -8,107 +11,101 @@ import {
     ToastAndroid,
     Image,
 } from 'react-native';
-import { SwipeListView } from 'react-native-swipe-list-view';
-import filter from 'lodash.filter';
-import { MaterialIcons } from '@expo/vector-icons';
 import { useMMKVNumber } from 'react-native-mmkv';
+import { SwipeListView } from 'react-native-swipe-list-view';
 
-import BossRenderItem from './BossRenderItem';
-import BossHiddenRenderItem from './BossHiddenRenderItem';
+import { BOSSES_ID_KEY } from '../CONSTANTS';
 import { BossContext } from '../contexts/BossContext';
 import AdComponent from './AdComponent';
-import { BOSSES_ID_KEY } from '../CONSTANTS';
+import BossHiddenRenderItem from './BossHiddenRenderItem';
+import BossRenderItem from './BossRenderItem';
 
 function _newLineAtComma(name) {
-    let newName = name
-    let index = name.indexOf(',')
+    let newName = name;
+    let index = name.indexOf(',');
     if (index >= 0) {
-        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2)
+        newName = name.slice(0, index + 1) + '\n' + name.slice(index + 2);
     }
-    index = name.indexOf('(')
+    index = name.indexOf('(');
     if (index >= 0) {
-        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index)
+        newName = newName.slice(0, index - 1) + '\n' + newName.slice(index);
     }
-    return newName
+    return newName;
 }
 
-const deathCountImage = require('../assets/floral-death-background.png')
-const footerImage = require('../assets/floral-boss-list-footer2.png')
+const footerImage = require('../assets/floral-boss-list-footer2.png');
+const deathCountImage = require('../assets/floral-death-background.png');
 
 export default function SearchBosses({ navigation }) {
-
-    const bossesSwipeListRef = useRef(null)
-    const [searchInputText, setSearchInputText] = useState('')
-    const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext)
-    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY)
-
-
+    const bossesSwipeListRef = useRef(null);
+    const [searchInputText, setSearchInputText] = useState('');
+    const { getDBObj, setDBObj, setPreviewBoss } = useContext(BossContext);
+    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY);
 
     useEffect(() => {
         console.log('BOSSES-LIST: Next ID to be inserted (%d)', getNewId);
-    }, [getNewId])
+    }, [getNewId]);
 
     const getSearchResults = useCallback(() => {
-        let filteredBosses = filter(getDBObj, (item) => {
-            let itemText = item.title.toLowerCase()
-            return itemText.includes(searchInputText.toLowerCase())
-        })
-        return filteredBosses
-    }, [getDBObj, searchInputText])
+        const filteredBosses = filter(getDBObj, (item) => {
+            const itemText = item.title.toLowerCase();
+            return itemText.includes(searchInputText.toLowerCase());
+        });
+        return filteredBosses;
+    }, [getDBObj, searchInputText]);
 
     const addBossHandler = () => {
         setDBObj((prevMMKVBossesList) => {
-            if (prevMMKVBossesList != undefined && prevMMKVBossesList.length >= 150) {
+            if (prevMMKVBossesList !== undefined && prevMMKVBossesList.length >= 150) {
                 console.log('BOSSES-LIST: Boss cannot be added! Maximum capacity reached!');
-                ToastAndroid.show('Boss cannot be added! Maximum capacity reached!', ToastAndroid.LONG)
-                return prevMMKVBossesList
+                ToastAndroid.show(
+                    'Boss cannot be added! Maximum capacity reached!',
+                    ToastAndroid.LONG
+                );
+                return prevMMKVBossesList;
             }
             if (searchInputText.length > 0) {
-                let newList = []
-                if (prevMMKVBossesList != undefined)
-                    newList = [...prevMMKVBossesList]
+                let newList = [];
+                if (prevMMKVBossesList !== undefined) newList = [...prevMMKVBossesList];
                 const newBoss = {
                     key: getNewId.toString(),
                     title: searchInputText.trim(),
-                    deaths: 0
-                }
-                newList.splice(0, 0, newBoss)
-                Keyboard.dismiss()
+                    deaths: 0,
+                };
+                newList.splice(0, 0, newBoss);
+                Keyboard.dismiss();
 
-                setNewId(getNewId + 1)
+                setNewId(getNewId + 1);
 
-                console.log('BOSSESLIST: Setting preview boss. %s', newBoss)
-                setPreviewBoss(newBoss)
+                console.log('BOSSESLIST: Setting preview boss. %s', newBoss);
+                setPreviewBoss(newBoss);
 
                 console.log('BOSSESLIST: Added new boss. %s', newList.slice(0, 3));
-                return newList
+                return newList;
             }
-        })
-        setSearchInputText('')
-    }
+        });
+        setSearchInputText('');
+    };
 
     const listFooterComponent = useCallback(() => (
         <View style={styles.alignCenter}>
-            <Image
-                source={footerImage}
-                resizeMode={'contain'}
-                style={styles.footerImage}
-            />
+            <Image source={footerImage} resizeMode="contain" style={styles.footerImage} />
         </View>
-    ))
+    ));
 
     const renderItem = (obj, rowMap) => {
-        return <BossRenderItem
-            item={obj.item}
-            rowMap={rowMap}
-            deathCountImage={deathCountImage}
-            setMMKVBossesList={setDBObj}
-            setPreviewBoss={setPreviewBoss}
-            itemText={_newLineAtComma(obj.item.title)}
-            navigation={navigation}
-        />
-    }
-
+        return (
+            <BossRenderItem
+                item={obj.item}
+                rowMap={rowMap}
+                deathCountImage={deathCountImage}
+                setMMKVBossesList={setDBObj}
+                setPreviewBoss={setPreviewBoss}
+                itemText={_newLineAtComma(obj.item.title)}
+                navigation={navigation}
+            />
+        );
+    };
 
     const renderHiddenItem = (data, rowMap) => (
         <BossHiddenRenderItem
@@ -117,26 +114,23 @@ export default function SearchBosses({ navigation }) {
             setDBObj={setDBObj}
             setPreviewBoss={setPreviewBoss}
         />
-
-    )
+    );
 
     return (
         <View style={styles.container}>
             <View style={styles.searchContainer}>
                 <TextInput
-                    autoCapitalize={'words'}
+                    autoCapitalize="words"
                     autoCorrect={false}
                     value={searchInputText}
                     onChangeText={setSearchInputText}
-                    placeholder={"Add or Search your bosses..."}
+                    placeholder="Add or Search your bosses..."
                     style={styles.searchBox}
-                    returnKeyType={'search'}
-                    selectionColor={'rgba(243, 211, 158, 0.4)'}
+                    returnKeyType="search"
+                    selectionColor="rgba(243, 211, 158, 0.4)"
                     maxLength={50}
                 />
-                <TouchableOpacity
-                    onPress={addBossHandler}
-                >
+                <TouchableOpacity onPress={addBossHandler}>
                     <View style={styles.button}>
                         <MaterialIcons name="add" size={35} color="rgba(47, 42, 35, 1)" />
                     </View>
@@ -151,7 +145,7 @@ export default function SearchBosses({ navigation }) {
                 ListFooterComponent={listFooterComponent}
                 showsVerticalScrollIndicator={false}
                 fadingEdgeLength={50}
-                overScrollMode={'never'}
+                overScrollMode="never"
                 leftOpenValue={75}
                 rightOpenValue={-75}
                 stopLeftSwipe={75 * 1.5}
@@ -161,11 +155,11 @@ export default function SearchBosses({ navigation }) {
                 previewOpenDelay={250}
                 friction={600}
                 tension={500}
-                disableRightSwipe={true}
+                disableRightSwipe
             />
             <AdComponent />
         </View>
-    )
+    );
 }
 
 const styles = StyleSheet.create({
@@ -178,7 +172,7 @@ const styles = StyleSheet.create({
     },
     footerImage: {
         height: 60,
-        opacity: 0.8
+        opacity: 0.8,
     },
     container: {
         flex: 1,
@@ -204,7 +198,7 @@ const styles = StyleSheet.create({
         color: 'rgb(243,211,158)',
         borderRadius: 5,
         padding: 5,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
     },
     button: {
         borderRadius: 5,
@@ -213,10 +207,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(243, 211, 158, 1)',
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     list: {
         width: '95%',
-        marginBottom: 15
+        marginBottom: 15,
     },
-})
+});

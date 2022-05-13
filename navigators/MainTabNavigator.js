@@ -1,25 +1,22 @@
-import React from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { Dimensions } from 'react-native'
+import React from 'react';
+// eslint-disable-next-line import/namespace
+import { Dimensions } from 'react-native';
 
 import CounterScreen from '../screens/CounterScreen';
 import DatabaseScreen from '../screens/DatabaseScreen';
 
-
 const Tab = createMaterialTopTabNavigator();
 
 export default function MainTabNavigator(props) {
-
     return (
         <Tab.Navigator
             initialLayout={{ width: Dimensions.get('window').width }}
             style={props.style}
-            sceneContainerStyle={
-                {
-                    backgroundColor: 'transparent',
-                    overflow: 'hidden',
-                }
-            }
+            sceneContainerStyle={{
+                backgroundColor: 'transparent',
+                overflow: 'hidden',
+            }}
             screenOptions={{
                 tabBarPressColor: 'transparent',
                 tabBarScrollEnabled: false,
@@ -29,7 +26,7 @@ export default function MainTabNavigator(props) {
                     width: '80%',
                     left: '10%',
                     bottom: '2%',
-                    borderRadius: 30
+                    borderRadius: 30,
                 },
                 tabBarItemStyle: {
                     backgroundColor: 'transparent',
@@ -47,24 +44,23 @@ export default function MainTabNavigator(props) {
                 tabBarIndicatorStyle: {
                     backgroundColor: '#rgba(243, 211, 158, 0.2)',
                     borderRadius: 30,
-                    height: '100%'
+                    height: '100%',
                 },
-            }}
-        >
+            }}>
             <Tab.Screen
                 name="D E A T H S"
                 component={CounterScreen}
                 options={{
-                    swipeEnabled: false
+                    swipeEnabled: false,
                 }}
             />
             <Tab.Screen
                 name="B O S S E S"
                 component={DatabaseScreen}
                 options={{
-                    swipeEnabled: false
+                    swipeEnabled: false,
                 }}
             />
         </Tab.Navigator>
-    )
+    );
 }

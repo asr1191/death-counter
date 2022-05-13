@@ -1,57 +1,50 @@
-import { useEffect } from 'react';
-import { View, StyleSheet, ImageBackground, } from 'react-native'
+/* eslint-disable import/namespace */
 import { NavigationContainer } from '@react-navigation/native';
-
-import { StatusBar } from 'expo-status-bar';
 import Constants from 'expo-constants';
 import { useFonts } from 'expo-font';
+import * as NavigationBar from 'expo-navigation-bar';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { View, StyleSheet, ImageBackground } from 'react-native';
 import { useMMKVNumber } from 'react-native-mmkv';
-import * as NavigationBar from 'expo-navigation-bar'
 
-import MainTabNavigator from './navigators/MainTabNavigator'
-import BossContextProvider from './contexts/BossContext';
-import IAPManagerWrapped from './components/IAPManager';
 import { BOSSES_ID_KEY } from './CONSTANTS';
-
+import IAPManagerWrapped from './components/IAPManager';
+import BossContextProvider from './contexts/BossContext';
+import MainTabNavigator from './navigators/MainTabNavigator';
 
 export default function App() {
-
     SplashScreen.preventAutoHideAsync();
     const [loaded] = useFonts({
         RomanAntique: require('./assets/fonts/RomanAntique.ttf'),
-        OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf')
+        OptimusPrinceps: require('./assets/fonts/OptimusPrinceps.ttf'),
     });
 
-    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY)
+    const [getNewId, setNewId] = useMMKVNumber(BOSSES_ID_KEY);
 
     useEffect(() => {
-        NavigationBar.setVisibilityAsync('hidden')
-        NavigationBar.setBehaviorAsync('overlay-swipe')
-    }, [])
+        NavigationBar.setVisibilityAsync('hidden');
+        NavigationBar.setBehaviorAsync('overlay-swipe');
+    }, []);
 
     useEffect(() => {
-        if (getNewId == undefined) {
-            setNewId(0)
+        if (getNewId === undefined) {
+            setNewId(0);
         }
-    }, [getNewId, setNewId])
+    }, [getNewId, setNewId]);
 
     if (loaded) {
-
         return (
             <NavigationContainer>
-                <StatusBar
-                    translucent={true}
-                    style={'light'}
-                />
+                <StatusBar translucent style="light" />
                 <View style={styles.bgContainer}>
                     <ImageBackground
                         style={styles.ringImageBgComponent}
                         source={require('./assets/wallpaper-16x10.png')}
-                        resizeMode={'cover'}
+                        resizeMode="cover"
                         imageStyle={styles.ringImageBgStyle}
-                        blurRadius={0}
-                    >
+                        blurRadius={0}>
                         <IAPManagerWrapped>
                             <BossContextProvider>
                                 <MainTabNavigator style={styles.tabNavigator} />
@@ -62,7 +55,7 @@ export default function App() {
             </NavigationContainer>
         );
     } else {
-        return null
+        return null;
     }
 }
 
@@ -82,6 +75,6 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     ringImageBgStyle: {
-        opacity: 1
-    }
-})
+        opacity: 1,
+    },
+});
